@@ -1,0 +1,13 @@
+/.emacs.desktop
+/.emacs.desktop.lock
+/projectile-bookmarks.eld
+/recentf
+/tramp
+/history
+/backups/*
+/.python-environments/*
+/anaconda-mode/*
+/auto-save-list/*
+/elpa/*
+/eshell/*
+/games/*
