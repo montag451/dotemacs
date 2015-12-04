@@ -20,6 +20,7 @@
                   helm
                   helm-projectile
                   magit
+                  markdown-mode
                   multi-term
                   ox-gfm
                   paredit
