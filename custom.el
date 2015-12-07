@@ -10,7 +10,6 @@
     (company-bbdb company-nxml company-css company-eclim company-clang company-semantic company-xcode company-cmake company-anaconda company-capf
                   (company-dabbrev-code company-gtags company-etags company-keywords)
                   company-oddmuse company-files company-dabbrev)))
- '(company-clang-arguments (quote ("-std=c++11")))
  '(company-quickhelp-mode t)
  '(custom-enabled-themes (quote (tangotango)))
  '(custom-safe-themes
