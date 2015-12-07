@@ -19,6 +19,7 @@
                   haskell-mode
                   helm
                   helm-projectile
+                  hydra
                   magit
                   markdown-mode
                   multi-term
@@ -41,23 +42,25 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
-;; winner
-(global-set-key (kbd "C-x w u") 'winner-undo)
-(global-set-key (kbd "C-x w r") 'winner-redo)
+;; load hydra
+(require 'hydra)
 
-;; windmove
-(windmove-default-keybindings)
-(global-set-key (kbd "C-x w h") 'windmove-left)
-(global-set-key (kbd "C-x w j") 'windmove-down)
-(global-set-key (kbd "C-x w k") 'windmove-up)
-(global-set-key (kbd "C-x w l") 'windmove-right)
-
-;; evil-leader
-(global-evil-leader-mode t)
-(evil-leader/set-key "j" 'evil-ace-jump-word-mode)
-(evil-leader/set-key "k" 'evil-ace-jump-char-mode)
-(evil-leader/set-key "b" 'helm-mini)
-(evil-leader/set-key "f" 'helm-find-files)
+;; hydra for window manipulation
+(defhydra hydra-window (global-map "C-x w" :color amaranth)
+  "Window manipulation"
+  ("h" windmove-left "left")
+  ("j" windmove-down "down")
+  ("k" windmove-up "up")
+  ("l" windmove-right "right")
+  ("u" winner-undo "undo")
+  ("r" winner-redo "redo")
+  ("s" (let ((win (split-window-horizontally)))
+         (select-window win)) "split horizontally")
+  ("v" (let ((win (split-window-below)))
+         (select-window win)) "split vertically")
+  ("x" delete-window "delete")
+  ("t" multi-term "term")
+  ("n" nil))
 
 ;; evil
 (define-key evil-normal-state-map (kbd "C-]") (kbd "\\ M-."))
