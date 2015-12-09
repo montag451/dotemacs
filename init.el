@@ -43,9 +43,6 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
-;; load hydra
-(require 'hydra)
-
 ;; hydra for window manipulation
 (defhydra hydra-window (global-map "C-x w" :color amaranth)
   "Window manipulation"
