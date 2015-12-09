@@ -67,6 +67,13 @@
   ("t" multi-term "term")
   ("n" nil))
 
+;; evil-leader
+(global-evil-leader-mode t)
+(evil-leader/set-key "j" 'evil-ace-jump-word-mode)
+(evil-leader/set-key "k" 'evil-ace-jump-char-mode)
+(evil-leader/set-key "b" 'helm-mini)
+(evil-leader/set-key "f" 'helm-find-files)
+
 ;; evil
 (define-key evil-normal-state-map (kbd "C-]") (kbd "\\ M-."))
 
