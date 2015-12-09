@@ -97,6 +97,7 @@
 ;; prog-mode
 (add-hook 'prog-mode-hook 'linum-mode)
 (add-hook 'prog-mode-hook 'ggtags-mode)
+(add-hook 'prog-mode-hook 'show-paren-mode)
 
 ;; python-mode
 (add-hook 'python-mode-hook 'anaconda-mode)
