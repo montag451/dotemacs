@@ -19,6 +19,7 @@
                   haskell-mode
                   helm
                   helm-projectile
+                  helm-swoop
                   hydra
                   magit
                   markdown-mode
@@ -90,6 +91,9 @@
 
 ;; helm-projectile
 (helm-projectile-on)
+
+;; helm-swoop
+(define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
 
 ;; after-init hooks
 (add-hook 'after-init-hook 'global-company-mode)
