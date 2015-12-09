@@ -62,6 +62,7 @@
   ("<" shrink-window-horizontally "shrink vertically")
   ("=" balance-windows "balance")
   ("x" delete-window "delete")
+  ("b" helm-mini "switch buffer")
   ("t" multi-term "term")
   ("n" nil))
 
