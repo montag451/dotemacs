@@ -48,6 +48,7 @@
  '(projectile-completion-system (quote helm))
  '(projectile-global-mode t)
  '(projectile-switch-project-action (quote helm-projectile-find-file))
+ '(projectile-use-git-grep t)
  '(recentf-auto-cleanup (quote never))
  '(savehist-mode t)
  '(scroll-bar-mode nil)
