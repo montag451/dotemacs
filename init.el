@@ -63,6 +63,7 @@
   ("=" balance-windows "balance")
   ("x" delete-window "delete")
   ("b" helm-mini "switch buffer")
+  ("f" helm-find-files "find files")
   ("t" multi-term "term")
   ("n" nil))
 
