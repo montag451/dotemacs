@@ -38,6 +38,7 @@
  '(helm-net-prefer-curl t)
  '(helm-split-window-in-side-p t)
  '(help-window-select t)
+ '(hydra-is-helpful nil)
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
  '(make-backup-files nil)
