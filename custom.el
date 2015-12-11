@@ -48,6 +48,7 @@
  '(org-use-speed-commands t)
  '(projectile-completion-system (quote helm))
  '(projectile-global-mode t)
+ '(projectile-mode-line nil)
  '(projectile-switch-project-action (quote helm-projectile-find-file))
  '(projectile-use-git-grep t)
  '(recentf-auto-cleanup (quote never))
