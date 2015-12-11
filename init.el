@@ -120,12 +120,15 @@
                                   (make-local-variable 'eldoc-documentation-function)
                                   (setq-local eldoc-documentation-function nil)))
 
-;; multi-term
-(global-set-key (kbd "C-x t t") 'multi-term-dedicated-toggle)
-(global-set-key (kbd "C-x t c") 'multi-term-dedicated-close)
-(global-set-key (kbd "C-x t s") 'multi-term-dedicated-select)
-(global-set-key (kbd "C-x t n") 'multi-term-next)
-(global-set-key (kbd "C-x t p") 'multi-term-prev)
+;; hydra for multi-term
+(defhydra hydra-multi-term (global-map "C-x t" :color amaranth)
+  "Multiple terminal"
+  ("t" multi-term-dedicated-toggle "toggle")
+  ("c" multi-term-dedicated-close "close")
+  ("s" multi-term-dedicated-select "select")
+  ("n" multi-term-next "next")
+  ("p" multi-term-prev "prev")
+  ("SPC" nil))
 
 ;; magit
 (global-set-key (kbd "C-x g") 'magit-status)
