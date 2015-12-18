@@ -123,12 +123,10 @@
 ;; hydra for multi-term
 (defhydra hydra-multi-term (global-map "C-x t" :color amaranth)
   "Multiple terminal"
-  ("t" multi-term-dedicated-toggle "toggle")
-  ("c" multi-term-dedicated-close "close")
-  ("s" multi-term-dedicated-select "select")
-  ("n" multi-term-next "next")
-  ("p" multi-term-prev "prev")
-  ("SPC" nil))
+  ("t" multi-term "create")
+  ("j" multi-term-next "next")
+  ("k" multi-term-prev "prev")
+  ("n" nil))
 
 ;; magit
 (global-set-key (kbd "C-x g") 'magit-status)
