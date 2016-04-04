@@ -54,6 +54,7 @@
  '(recentf-auto-cleanup (quote never))
  '(savehist-mode t)
  '(scroll-bar-mode nil)
+ '(server-mode t)
  '(term-bind-key-alist (quote (("C-c C-c" . term-interrupt-subjob))))
  '(term-unbind-key-list (quote ("C-x" "C-c" "C-h" "C-y" "M-x" "M-:")))
  '(text-mode-hook (quote (text-mode-hook-identify auto-fill-mode)))
