@@ -10,7 +10,6 @@
                   company-anaconda
                   company-quickhelp
                   evil
-                  evil-jumper
                   evil-leader
                   evil-nerd-commenter
                   evil-paredit
