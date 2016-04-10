@@ -28,6 +28,7 @@
                   paredit
                   projectile
                   tangotango-theme
+                  rust-mode
                   virtualenvwrapper))
       (need-refresh t))
   (dolist (package packages)
