@@ -23,9 +23,7 @@
  '(evil-insert-state-modes
    (quote
     (erc-mode geiser-repl-mode inferior-apl-mode inferior-caml-mode inferior-j-mode inferior-scheme-mode inferior-sml-mode internal-ange-ftp-mode prolog-inferior-mode reb-mode slime-repl-mode wdired-mode)))
- '(evil-jumper-mode t)
  '(evil-leader/leader "<SPC>")
- '(evil-mode t)
  '(evil-search-wrap nil)
  '(evil-symbol-word-search t)
  '(helm-buffers-fuzzy-matching t)
