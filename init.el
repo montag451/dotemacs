@@ -27,6 +27,8 @@
                   paredit
                   projectile
                   tangotango-theme
+                  restclient
+                  restclient-helm
                   rust-mode
                   virtualenvwrapper))
       (need-refresh t))
