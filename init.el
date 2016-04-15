@@ -69,6 +69,14 @@
   ("t" multi-term "term")
   ("n" nil))
 
+;; hydra for multi-term
+(defhydra hydra-multi-term (global-map "C-x t" :color amaranth)
+  "Multiple terminal"
+  ("t" multi-term "create")
+  ("j" multi-term-next "next")
+  ("k" multi-term-prev "prev")
+  ("n" nil))
+
 ;; evil
 (evil-mode t)
 (define-key evil-normal-state-map (kbd "C-]") (kbd "\\ M-."))
@@ -79,6 +87,10 @@
 (evil-leader/set-key "k" 'evil-ace-jump-char-mode)
 (evil-leader/set-key "b" 'helm-mini)
 (evil-leader/set-key "f" 'helm-find-files)
+
+;; evil-nerd-commenter
+(evilnc-default-hotkeys)
+(define-key evil-visual-state-map (kbd ",ci") 'evilnc-comment-or-uncomment-lines)
 
 ;; helm
 (global-set-key (kbd "M-x") 'helm-M-x)
@@ -96,6 +108,13 @@
 
 ;; helm-swoop
 (define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
+
+;; magit
+(global-set-key (kbd "C-x g") 'magit-status)
+(global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
+
+;; virtualenvwrapper
+(venv-initialize-eshell)
 
 ;; after-init hooks
 (add-hook 'after-init-hook 'global-company-mode)
@@ -122,22 +141,3 @@
                                   (eldoc-mode t)
                                   (make-local-variable 'eldoc-documentation-function)
                                   (setq-local eldoc-documentation-function nil)))
-
-;; hydra for multi-term
-(defhydra hydra-multi-term (global-map "C-x t" :color amaranth)
-  "Multiple terminal"
-  ("t" multi-term "create")
-  ("j" multi-term-next "next")
-  ("k" multi-term-prev "prev")
-  ("n" nil))
-
-;; magit
-(global-set-key (kbd "C-x g") 'magit-status)
-(global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
-
-;; evil-nerd-commenter
-(evilnc-default-hotkeys)
-(define-key evil-visual-state-map (kbd ",ci") 'evilnc-comment-or-uncomment-lines)
-
-;; virtualenvwrapper
-(venv-initialize-eshell)
