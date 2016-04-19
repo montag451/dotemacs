@@ -127,7 +127,7 @@
 
 ;; python-mode
 (add-hook 'python-mode-hook 'anaconda-mode)
-(add-hook 'python-mode-hook 'eldoc-mode)
+(add-hook 'python-mode-hook 'anaconda-eldoc-mode)
 
 ;; haskell-mode
 (add-hook 'haskell-mode-hook 'subword-mode) 
