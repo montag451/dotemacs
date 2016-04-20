@@ -49,6 +49,7 @@
  '(projectile-mode-line nil)
  '(projectile-switch-project-action (quote helm-projectile-find-file))
  '(projectile-use-git-grep t)
+ '(racer-rust-src-path "~/.emacs.d/rust/src")
  '(recentf-auto-cleanup (quote never))
  '(savehist-mode t)
  '(scroll-bar-mode nil)

@@ -142,3 +142,7 @@
                                   (eldoc-mode t)
                                   (make-local-variable 'eldoc-documentation-function)
                                   (setq-local eldoc-documentation-function nil)))
+
+;; rust-mode
+(add-hook 'rust-mode-hook 'racer-mode)
+(add-hook 'racer-mode-hook 'eldoc-mode)
