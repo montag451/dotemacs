@@ -101,7 +101,7 @@
 (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
 (define-key helm-map (kbd "C-z") 'helm-select-action)
 (require 'helm-config)
-(define-key helm-command-map (kbd "g") 'helm-do-grep)
+(define-key helm-command-map (kbd "g") 'helm-do-grep-ag)
 (define-key helm-command-map (kbd "SPC") 'helm-all-mark-rings)
 
 ;; helm-projectile
