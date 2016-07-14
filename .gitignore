@@ -4,10 +4,10 @@
 /recentf
 /tramp
 /history
-/backups/*
-/.python-environments/*
-/anaconda-mode/*
-/auto-save-list/*
-/eshell/*
-/games/*
-/url/*
+/backups/
+/.python-environments/
+/anaconda-mode/
+/auto-save-list/
+/eshell/
+/games/
+/url/
