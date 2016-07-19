@@ -17,6 +17,7 @@
                   ggtags
                   haskell-mode
                   helm
+                  helm-ag
                   helm-projectile
                   helm-swoop
                   hydra
