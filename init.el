@@ -131,9 +131,9 @@
 (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
 
 ;; haskell-mode
-(add-hook 'haskell-mode-hook 'subword-mode) 
-(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+(add-hook 'haskell-mode-hook 'subword-mode)
+(add-hook 'haskell-mode-hook 'haskell-doc-mode)
+(add-hook 'haskell-mode-hook 'haskell-indentation-mode)
 (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 
 ;; emacs-lisp-mode
