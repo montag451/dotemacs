@@ -31,7 +31,8 @@
                   restclient
                   restclient-helm
                   rust-mode
-                  virtualenvwrapper))
+                  virtualenvwrapper
+                  yaml-mode))
       (need-refresh t))
   (dolist (package packages)
     (if (not (package-installed-p package))
