@@ -20,6 +20,7 @@
                   helm-ag
                   helm-projectile
                   helm-swoop
+                  htmlize
                   hydra
                   magit
                   markdown-mode
