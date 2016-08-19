@@ -26,6 +26,7 @@
  '(evil-leader/leader "<SPC>")
  '(evil-search-wrap nil)
  '(evil-symbol-word-search t)
+ '(haskell-hoogle-command nil)
  '(haskell-hoogle-url "http://hoogle.haskell.org/?hoogle=%s")
  '(helm-buffers-fuzzy-matching t)
  '(helm-command-prefix-key "C-c h")
