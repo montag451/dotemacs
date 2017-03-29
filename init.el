@@ -3,6 +3,7 @@
              '("melpa" . "http://melpa.org/packages/"))
 (package-initialize)
 (let ((packages '(ace-jump-mode
+                  all-the-icons
                   anaconda-mode
                   cider
                   cmake-mode
