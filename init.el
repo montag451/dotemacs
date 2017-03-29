@@ -27,6 +27,7 @@
                   multi-term
                   ox-gfm
                   paredit
+                  plantuml-mode
                   projectile
                   tangotango-theme
                   restclient
