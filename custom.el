@@ -46,6 +46,7 @@
  '(menu-bar-mode nil)
  '(multi-term-dedicated-select-after-open-p t)
  '(multi-term-program "/bin/bash")
+ '(neo-theme (quote icons))
  '(org-babel-load-languages (quote ((plantuml . t) (emacs-lisp . t))))
  '(org-plantuml-jar-path "/home/vincent/.emacs.d/plantuml.8057.jar")
  '(org-use-speed-commands t)

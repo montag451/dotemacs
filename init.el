@@ -25,6 +25,7 @@
                   magit
                   markdown-mode
                   multi-term
+                  neotree
                   ox-gfm
                   paredit
                   plantuml-mode
