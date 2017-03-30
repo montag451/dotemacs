@@ -42,6 +42,7 @@
  '(hydra-is-helpful nil)
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
+ '(magit-commit-show-diff nil)
  '(make-backup-files nil)
  '(menu-bar-mode nil)
  '(multi-term-dedicated-select-after-open-p t)
