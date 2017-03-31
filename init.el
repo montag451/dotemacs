@@ -23,6 +23,7 @@
                   helm-swoop
                   htmlize
                   hydra
+                  jinja2-mode
                   magit
                   markdown-mode
                   multi-term
@@ -50,6 +51,9 @@
 ;; load custom settings
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
+
+;; set auto-mode-alist
+(add-to-list 'auto-mode-alist '("\\.j2\\'" . jinja2-mode))
 
 ;; hydra for window manipulation
 (defhydra hydra-window (global-map "C-x w" :color amaranth)
