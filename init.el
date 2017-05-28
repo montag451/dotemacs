@@ -52,9 +52,6 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
-;; set auto-mode-alist
-(add-to-list 'auto-mode-alist '("\\.j2\\'" . jinja2-mode))
-
 ;; hydra for window manipulation
 (defhydra hydra-window (global-map "C-x w" :color amaranth)
   "Window manipulation"
@@ -156,3 +153,12 @@
 ;; rust-mode
 (add-hook 'rust-mode-hook 'racer-mode)
 (add-hook 'racer-mode-hook 'eldoc-mode)
+
+;; nix-mode
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/external/nix-mode"))
+(autoload 'nix-mode "nix-mode" nil t nil)
+(add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
+(add-to-list 'auto-mode-alist '("\\.nix.in\\'" . nix-mode))
+
+;; jinja2-mode
+(add-to-list 'auto-mode-alist '("\\.j2\\'" . jinja2-mode))

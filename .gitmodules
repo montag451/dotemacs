@@ -2,3 +2,6 @@
 	path = rust
 	url = https://github.com/rust-lang/rust.git
 	branch = stable
+[submodule "external/nix-mode"]
+	path = external/nix-mode
+	url = https://github.com/matthewbauer/nix-mode.git
