@@ -11,8 +11,8 @@ value of the symbol."
         (unless args
           (error "Missing value for: %S" sym))
         (let ((val (pop args)))
-          (push `(if (custom-variable-p (quote ,sym))
-                     (customize-set-variable (quote ,sym) ,val)
+          (push `(if (custom-variable-p ',sym)
+                     (customize-set-variable ',sym ,val)
                    (setq ,sym ,val))
                 def))))
     `(progn ,@(reverse def))))
