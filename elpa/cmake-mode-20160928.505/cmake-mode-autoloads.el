@@ -1,10 +1,10 @@
 ;;; cmake-mode-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "cmake-mode" "cmake-mode.el" (22515 29313 643120
-;;;;;;  18000))
+;;;### (autoloads nil "cmake-mode" "cmake-mode.el" (22932 28385 790043
+;;;;;;  392000))
 ;;; Generated autoloads from cmake-mode.el
 
 (autoload 'cmake-mode "cmake-mode" "\

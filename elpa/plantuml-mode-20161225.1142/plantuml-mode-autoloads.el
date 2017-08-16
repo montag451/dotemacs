@@ -1,10 +1,10 @@
 ;;; plantuml-mode-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "plantuml-mode" "plantuml-mode.el" (22713 54029
-;;;;;;  914443 93000))
+;;;### (autoloads nil "plantuml-mode" "plantuml-mode.el" (22932 28382
+;;;;;;  486998 815000))
 ;;; Generated autoloads from plantuml-mode.el
 
 (add-to-list 'auto-mode-alist '("\\.\\(plantuml\\|pum\\|plu\\)\\'" . plantuml-mode))
