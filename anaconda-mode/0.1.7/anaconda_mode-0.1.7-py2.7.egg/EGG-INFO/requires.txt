@@ -1,2 +1,0 @@
-jedi>=0.10.0
-service_factory>=0.1.5
