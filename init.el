@@ -205,6 +205,12 @@ value of the symbol."
   (add-hook 'lisp-mode-hook 'paredit-mode)
   (add-hook 'eval-expression-minibuffer-setup-hook 'paredit-mode))
 
+(use-package evil-paredit
+  :ensure t
+  :defer t
+  :init
+  (add-hook 'emacs-lisp-mode-hook 'evil-paredit-mode))
+
 (use-package company
   :ensure t
   :defer t
