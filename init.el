@@ -1,56 +1,264 @@
+;; helper functions and macros
+(defmacro my/setq (&rest args)
+  "A macro that behaves like `setq' except when a symbol has been defined
+using `defcustom'. In this case, it uses `customize-set-variable' to set the
+value of the symbol."
+  (let ((def '()))
+    (while args
+      (let ((sym (pop args)))
+        (unless (symbolp sym)
+          (error "Symbol expected, found: %S" sym))
+        (unless args
+          (error "Missing value for: %S" sym))
+        (let ((val (pop args)))
+          (push `(if (custom-variable-p (quote ,sym))
+                     (customize-set-variable (quote ,sym) ,val)
+                   (setq ,sym ,val))
+                def))))
+    `(progn ,@(reverse def))))
+
+;; initialize package.el machinery
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/"))
 (package-initialize)
-(let ((packages '(ace-jump-mode
-                  all-the-icons
-                  anaconda-mode
-                  cider
-                  cmake-mode
-                  company
-                  company-anaconda
-                  company-quickhelp
-                  evil
-                  evil-leader
-                  evil-nerd-commenter
-                  evil-paredit
-                  fill-column-indicator
-                  ggtags
-                  haskell-mode
-                  helm
-                  helm-ag
-                  helm-projectile
-                  helm-swoop
-                  htmlize
-                  hydra
-                  jinja2-mode
-                  magit
-                  markdown-mode
-                  multi-term
-                  neotree
-                  ox-gfm
-                  paredit
-                  plantuml-mode
-                  projectile
-                  tangotango-theme
-                  restclient
-                  restclient-helm
-                  rust-mode
-                  virtualenvwrapper
-                  yaml-mode))
-      (need-refresh t))
-  (dolist (package packages)
-    (if (not (package-installed-p package))
-        (progn
-          (if need-refresh
-	      (progn
-		(package-refresh-contents)
-		(setq need-refresh nil)))
-          (package-install package)))))
 
-;; load custom settings
-(setq custom-file "~/.emacs.d/custom.el")
-(load custom-file)
+;; install and configure use-package
+(unless (package-installed-p 'use-package)
+    (progn
+      (package-refresh-contents)
+      (package-install 'use-package t)))
+(my/setq use-package-verbose t)
+
+;; global variables
+(my/setq my/plantuml-jar-path (expand-file-name (concat user-emacs-directory "plantuml.8057.jar")))
+
+;; no startup screen please
+(my/setq inhibit-startup-screen t)
+
+;; no backup files
+(my/setq make-backup-files nil)
+
+;; tabulations are evil
+(my/setq indent-tabs-mode nil)
+
+(my/setq frame-title-format
+         '((:eval (if (buffer-file-name)
+                      (abbreviate-file-name (buffer-file-name))
+                    "%b"))))
+
+;; blinking cursor is annoying
+(blink-cursor-mode -1)
+
+;; disable the bell, it drives me crazy
+(my/setq ring-bell-function 'ignore)
+
+;; save some screen estate
+(menu-bar-mode -1)
+(when (fboundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
+
+;; set and load custom-file
+(my/setq custom-file (concat user-emacs-directory "custom.el"))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
+(use-package help
+  :defer t
+  :config
+  (my/setq help-window-select t))
+
+(use-package mouse
+  :defer t
+  :config
+  (my/setq mouse-yank-at-point t))
+
+(use-package select
+  :defer t
+  :config
+  (my/setq select-enable-primary t))
+
+(use-package recentf
+  :defer t
+  :config
+  (my/setq recentf-auto-cleanup 'never))
+
+(use-package cc-vars
+  :defer t
+  :config
+  (my/setq c-basic-offset 4))
+
+(use-package ediff-wind
+  :defer t
+  :config
+  (my/setq ediff-window-setup-function 'ediff-setup-windows-plain ))
+
+(use-package ediff-init
+  :defer t
+  :config
+  (add-hook 'ediff-quit-hook 'winner-undo t))
+
+(use-package indents
+  :config
+  (my/setq tab-always-indent 'complete))
+
+(use-package hippie-exp
+  :bind ("M-/" . hippie-expand))
+
+(use-package simple
+  :config
+  (column-number-mode)
+  (size-indication-mode))
+
+(use-package paren
+  :config
+  (show-paren-mode))
+
+(use-package desktop
+  :config
+  (desktop-save-mode))
+
+(use-package savehist
+  :config
+  (savehist-mode))
+
+(use-package winner
+  :config
+  (winner-mode))
+
+(use-package server
+  :config
+  (server-mode))
+
+(use-package dired
+  :defer t
+  :config
+  (my/setq dired-recursive-copies 'always)
+  (my/setq dired-recursive-deletes 'always))
+
+(use-package tangotango-theme
+  :ensure t
+  :config
+  (my/setq custom-enabled-themes '(tangotango)))
+
+(use-package evil
+  :ensure t
+  :config
+  (define-key evil-normal-state-map (kbd "C-]") (kbd "\\ M-."))
+  (my/setq evil-search-wrap nil)
+  (my/setq evil-symbol-word-search t)
+  (evil-set-initial-state 'term-mode 'emacs)
+  (evil-set-initial-state 'eshell-mode 'emacs)
+  (evil-set-initial-state 'shell-mode 'emacs)
+  (evil-set-initial-state 'inferior-emacs-lisp-mode 'emacs)
+  (evil-set-initial-state 'dired-mode 'emacs)
+  (evil-set-initial-state 'gud-mode 'emacs)
+  (evil-set-initial-state 'inferior-python-mode 'emacs)
+  (evil-set-initial-state 'haskell-interactive-mode 'emacs)
+  (evil-set-initial-state 'haskell-error-mode 'emacs)
+  (evil-set-initial-state 'image-mode 'emacs)
+  (evil-mode))
+
+(use-package helm
+  :ensure t
+  :demand
+  :init
+  (require 'helm-config)
+  :bind (("M-x" . helm-M-x)
+         ("C-x C-f" . helm-find-files)
+         ("C-x b" . helm-mini)
+         :map helm-map
+         ("<tab>" . helm-execute-persistent-action)
+         ("C-i" . helm-execute-persistent-action)
+         ("C-z" . helm-select-action)
+         :map helm-command-map
+         ("g" . helm-do-grep-ag))
+  :config
+  (my/setq helm-command-prefix-key "C-c h")
+  (my/setq helm-buffers-fuzzy-matching t)
+  (my/setq helm-recentf-fuzzy-match t)
+  (my/setq helm-M-x-fuzzy-match t)
+  (my/setq helm-ff-file-name-history-use-recentf t)
+  (my/setq helm-ff-search-library-in-sexp t)
+  (my/setq helm-mode-handle-completion-in-region nil)
+  (my/setq helm-move-to-line-cycle-in-source t)
+  (my/setq helm-net-prefer-curl t)
+  (my/setq helm-split-window-in-side-p t)
+  (helm-mode))
+
+(use-package helm-swoop
+  :ensure t
+  :bind (:map isearch-mode-map
+              ("M-i" . helm-swoop-from-isearch))
+  :config
+  (my/setq helm-swoop-speed-or-color t)
+  (my/setq helm-swoop-use-line-number-face t))
+
+(use-package paredit
+  :ensure t
+  :defer t
+  :init
+  (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+  (add-hook 'ielm-mode-hook 'paredit-mode)
+  (add-hook 'lisp-mode-hook 'paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook 'paredit-mode))
+
+(use-package company
+  :ensure t
+  :defer t
+  :init
+  (add-hook 'after-init-hook 'global-company-mode)
+  :config
+  (my/setq company-show-numbers t))
+
+(use-package company-quickhelp
+  :ensure t
+  :after company
+  :config
+  (company-quickhelp-mode))
+
+(use-package company-restclient
+  :ensure t
+  :after company
+  :config
+  (add-to-list 'company-backends 'company-restclient))
+
+(use-package company-anaconda
+  :ensure t
+  :after company
+  :config
+  (add-to-list 'company-backends 'company-anaconda))
+
+(use-package projectile
+  :ensure t
+  :config
+  (my/setq projectile-completion-system 'helm)
+  (my/setq projectile-mode-line nil)
+  (my/setq projectile-use-git-grep t)
+  (projectile-mode))
+
+(use-package magit
+  :ensure t
+  :bind (("C-x g" . magit-status)
+         ("C-x M-g" . magit-dispatch-popup))
+  :config
+  (my/setq magit-commit-show-diff nil))
+
+(use-package multi-term
+  :ensure t
+  :defer t
+  :config
+  (my/setq multi-term-dedicated-select-after-open-p t)
+  (my/setq term-bind-key-alist '(("C-c C-c" . term-interrupt-subjob)))
+  (my/setq term-unbind-key-list '("C-x" "C-c" "C-h" "C-y" "M-x" "M-:")))
+
+(use-package hydra
+  :ensure t
+  :defer t
+  :config
+  (my/setq hydra-is-helpful nil))
 
 ;; hydra for window manipulation
 (defhydra hydra-window (global-map "C-x w" :color amaranth)
@@ -68,10 +276,10 @@
   ("+" enlarge-window "enlarge vertically")
   ("-" shrink-window "shrink vertically")
   (">" enlarge-window-horizontally "enlarge horizontally")
-  ("<" shrink-window-horizontally "shrink vertically")
+  ("<" shrink-window-horizontally "shrink horizontally")
   ("=" balance-windows "balance")
   ("x" delete-window "delete")
-  ("X" delete-other-windows "delete")
+  ("X" delete-other-windows "delete other windows")
   ("b" helm-mini "switch buffer")
   ("f" helm-find-files "find files")
   ("t" multi-term "term")
@@ -85,80 +293,92 @@
   ("k" multi-term-prev "prev")
   ("n" nil))
 
-;; evil
-(evil-mode t)
-(define-key evil-normal-state-map (kbd "C-]") (kbd "\\ M-."))
+(use-package ggtags
+  :ensure t
+  :defer t
+  :init
+  (add-hook 'prog-mode-hook 'ggtags-mode))
 
-;; evil-leader
-(global-evil-leader-mode t)
-(evil-leader/set-key "j" 'evil-ace-jump-word-mode)
-(evil-leader/set-key "k" 'evil-ace-jump-char-mode)
-(evil-leader/set-key "b" 'helm-mini)
-(evil-leader/set-key "f" 'helm-find-files)
+(use-package anaconda-mode
+  :ensure t
+  :defer t
+  :init
+  (add-hook 'python-mode-hook 'anaconda-mode)
+  (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
 
-;; evil-nerd-commenter
-(evilnc-default-hotkeys)
-(define-key evil-visual-state-map (kbd ",ci") 'evilnc-comment-or-uncomment-lines)
+(use-package haskell-mode
+  :ensure t
+  :defer t
+  :config
+  (add-hook 'haskell-mode-hook 'subword-mode)
+  (add-hook 'haskell-mode-hook 'haskell-doc-mode)
+  (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
+  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+  (my/setq haskell-hoogle-command nil)
+  (my/setq haskell-hoogle-url "http://hoogle.haskell.org/?hoogle=%s")
+  (my/setq haskell-process-type 'stack-ghci))
 
-;; helm
-(global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
-(global-set-key (kbd "C-x b") 'helm-mini)
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
-(define-key helm-map (kbd "C-z") 'helm-select-action)
-(require 'helm-config)
-(define-key helm-command-map (kbd "g") 'helm-do-grep-ag)
-(define-key helm-command-map (kbd "SPC") 'helm-all-mark-rings)
+(use-package nix-mode
+  :load-path  "external/nix-mode"
+  :mode (("\\.nix\\'" . nix-mode)
+         ("\\.nix.in\\'" . nix-mode)))
 
-;; helm-projectile
-(helm-projectile-on)
+(use-package plantuml-mode
+  :ensure t
+  :defer t
+  :config
+  (my/setq plantuml-jar-path my/plantuml-jar-path))
 
-;; helm-swoop
-(define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
+(use-package htmlize :ensure t :defer t)
 
-;; magit
-(global-set-key (kbd "C-x g") 'magit-status)
-(global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
+(use-package markdown-mode :ensure t :defer t)
 
-;; virtualenvwrapper
-(venv-initialize-eshell)
+(use-package restclient :ensure t :defer t)
 
-;; after-init hooks
-(add-hook 'after-init-hook 'global-company-mode)
+(use-package restclient-helm :ensure t :defer t)
 
-;; prog-mode
-(add-hook 'prog-mode-hook 'linum-mode)
-(add-hook 'prog-mode-hook 'ggtags-mode)
-(add-hook 'prog-mode-hook 'show-paren-mode)
+(use-package cmake-mode :ensure t :defer t)
 
-;; python-mode
-(add-hook 'python-mode-hook 'anaconda-mode)
-(add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+(use-package yaml-mode :ensure t :defer t)
 
-;; haskell-mode
-(add-hook 'haskell-mode-hook 'subword-mode)
-(add-hook 'haskell-mode-hook 'haskell-doc-mode)
-(add-hook 'haskell-mode-hook 'haskell-indentation-mode)
-(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+(use-package jinja2-mode
+  :ensure t
+  :mode (("\\.j2\\'" . jinja2-mode)))
 
-;; emacs-lisp-mode
-(add-hook 'emacs-lisp-mode-hook 'paredit-mode)
-(add-hook 'emacs-lisp-mode-hook 'evil-paredit-mode)
-(add-hook 'emacs-lisp-mode-hook (lambda ()
-                                  (eldoc-mode t)
-                                  (make-local-variable 'eldoc-documentation-function)
-                                  (setq-local eldoc-documentation-function nil)))
+(use-package org
+  :defer t
+  :config
+  (my/setq org-use-speed-commands t)
+  (my/setq org-babel-load-languages '((plantuml . t)
+                                      (emacs-lisp . t))))
 
-;; rust-mode
-(add-hook 'rust-mode-hook 'racer-mode)
-(add-hook 'racer-mode-hook 'eldoc-mode)
+(use-package ob-plantuml
+  :defer t
+  :config
+  (my/setq org-plantuml-jar-path my/plantuml-jar-path))
 
-;; nix-mode
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/external/nix-mode"))
-(autoload 'nix-mode "nix-mode" nil t nil)
-(add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
-(add-to-list 'auto-mode-alist '("\\.nix.in\\'" . nix-mode))
+(use-package ox-gfm :ensure t :defer t)
 
-;; jinja2-mode
-(add-to-list 'auto-mode-alist '("\\.j2\\'" . jinja2-mode))
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
+
+(use-package whitespace
+  :defer t
+  :init
+  (add-hook 'prog-mode-hook 'whitespace-mode)
+  (add-hook 'text-mode-hook 'whitespace-mode)
+  :config
+  (my/setq whitespace-line-column 80)
+  (my/setq whitespace-style '(face tabs empty trailing lines-tail)))
+
+(use-package term
+  :defer t
+  :config
+  (add-hook 'term-mode-hook
+            (lambda ()
+              (define-key
+                evil-emacs-state-local-map
+                (kbd "C-z")
+                'term-send-raw))))
