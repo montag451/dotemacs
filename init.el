@@ -388,3 +388,21 @@ value of the symbol."
                 evil-emacs-state-local-map
                 (kbd "C-z")
                 'term-send-raw))))
+
+(use-package popwin
+  :ensure t
+  :demand
+  :config
+  (global-set-key (kbd "C-c s") popwin:keymap)
+  (add-to-list 'popwin:special-display-config '("^\\*Man .*\\*$" :regexp t :width 80 :position right))
+  (defun my/popwin-help-mode-off ()
+    "Turn `popwin-mode' off for *Help* buffers."
+    (when (boundp 'popwin:special-display-config)
+      (delq 'help-mode popwin:special-display-config)))
+  (defun my/popwin-help-mode-on ()
+    "Turn `popwin-mode' on for *Help* buffers."
+    (when (boundp 'popwin:special-display-config)
+      (add-to-list 'popwin:special-display-config 'help-mode nil #'eq)))
+  (add-hook 'helm-minibuffer-set-up-hook #'my/popwin-help-mode-off)
+  (add-hook 'helm-cleanup-hook #'my/popwin-help-mode-on)
+  (popwin-mode))
