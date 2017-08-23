@@ -146,7 +146,6 @@ value of the symbol."
 (use-package evil
   :ensure t
   :config
-  (define-key evil-normal-state-map (kbd "C-]") (kbd "\\ M-."))
   (my/setq evil-search-wrap nil)
   (my/setq evil-symbol-word-search t)
   (evil-set-initial-state 'term-mode 'emacs)
@@ -189,6 +188,27 @@ value of the symbol."
   (my/setq helm-net-prefer-curl t)
   (my/setq helm-split-window-in-side-p t)
   (helm-mode))
+
+(use-package helm-gtags
+  :ensure t
+  :defer t
+  :init
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (let ((map evil-normal-state-local-map))
+                (define-key map (kbd "C-]") 'helm-gtags-dwim)
+                (define-key map (kbd "C-t") 'helm-gtags-pop-stack))
+              (helm-gtags-mode)))
+  :config
+  (my/setq helm-gtags-mode-name "")
+  (let ((map helm-gtags-mode-map))
+    (define-key map (kbd "C-c g s") 'helm-gtags-select)
+    (define-key map (kbd "C-c g f") 'helm-gtags-select-path)
+    (define-key map (kbd "C-c g u") 'helm-gtags-update-tags)
+    (define-key map (kbd "C-c g t") 'helm-gtags-show-stack)
+    (define-key map (kbd "C-c g r") 'helm-gtags-resume)
+    (define-key map (kbd "C-c g j") 'helm-gtags-next-history)
+    (define-key map (kbd "C-c g k") 'helm-gtags-previous-history)))
 
 (use-package paredit
   :ensure t
@@ -292,12 +312,6 @@ value of the symbol."
   ("j" multi-term-next "next")
   ("k" multi-term-prev "prev")
   ("n" nil))
-
-(use-package ggtags
-  :ensure t
-  :defer t
-  :init
-  (add-hook 'prog-mode-hook 'ggtags-mode))
 
 (use-package anaconda-mode
   :ensure t
