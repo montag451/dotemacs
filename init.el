@@ -394,7 +394,9 @@ value of the symbol."
   :demand
   :config
   (global-set-key (kbd "C-c s") popwin:keymap)
-  (add-to-list 'popwin:special-display-config '("^\\*Man .*\\*$" :regexp t :width 80 :position right))
+  (my/setq popwin:reuse-window nil)
+  (add-to-list 'popwin:special-display-config
+               '("^\\*Man .*\\*$" :regexp t :width 80 :position right))
   (defun my/popwin-help-mode-off ()
     "Turn `popwin-mode' off for *Help* buffers."
     (when (boundp 'popwin:special-display-config)
