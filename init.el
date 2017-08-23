@@ -174,7 +174,9 @@ value of the symbol."
          ("C-i" . helm-execute-persistent-action)
          ("C-z" . helm-select-action)
          :map helm-command-map
-         ("g" . helm-do-grep-ag))
+         ("g" . helm-do-grep-ag)
+         :map isearch-mode-map
+         ("M-i" . helm-occur-from-isearch))
   :config
   (my/setq helm-command-prefix-key "C-c h")
   (my/setq helm-buffers-fuzzy-matching t)
@@ -187,14 +189,6 @@ value of the symbol."
   (my/setq helm-net-prefer-curl t)
   (my/setq helm-split-window-in-side-p t)
   (helm-mode))
-
-(use-package helm-swoop
-  :ensure t
-  :bind (:map isearch-mode-map
-              ("M-i" . helm-swoop-from-isearch))
-  :config
-  (my/setq helm-swoop-speed-or-color t)
-  (my/setq helm-swoop-use-line-number-face t))
 
 (use-package paredit
   :ensure t
