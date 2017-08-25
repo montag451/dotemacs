@@ -138,6 +138,11 @@ value of the symbol."
   (my/setq dired-recursive-copies 'always)
   (my/setq dired-recursive-deletes 'always))
 
+(use-package shell
+  :defer t
+  :config
+  (my/setq shell-font-lock-keywords nil))
+
 (use-package tangotango-theme
   :ensure t
   :config
