@@ -60,6 +60,10 @@ value of the symbol."
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 
+;; resize all the windows of a combination when one window of the
+;; combination is deleted, it helps keeping the layout of frames
+(my/setq window-combination-resize t)
+
 ;; set and load custom-file
 (my/setq custom-file (concat user-emacs-directory "custom.el"))
 (when (file-exists-p custom-file)
