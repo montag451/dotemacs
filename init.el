@@ -155,6 +155,15 @@ value of the symbol."
 (use-package evil
   :ensure t
   :config
+  (defun my/fix-evil-hiding-minor-mode-map (&rest _args)
+    "See https://github.com/syl20bnr/spacemacs/issues/9391"
+    (let ((mjm-keymap (intern-soft (format "%s-map" major-mode))))
+      (when mjm-keymap
+        (setq evil-mode-map-alist
+              (cl-loop for (c . k) in evil-mode-map-alist
+                       unless (and (eq c t) (eq k (symbol-value mjm-keymap)))
+                       collect (cons c k))))))
+  (advice-add 'evil-normalize-keymaps :after #'my/fix-evil-hiding-minor-mode-map)
   (my/setq evil-search-wrap nil)
   (my/setq evil-symbol-word-search t)
   (evil-set-initial-state 'term-mode 'emacs)
