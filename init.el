@@ -449,3 +449,8 @@ value of the symbol."
   (add-hook 'helm-minibuffer-set-up-hook #'my/popwin-help-mode-off)
   (add-hook 'helm-cleanup-hook #'my/popwin-help-mode-on)
   (popwin-mode))
+
+(use-package rainbow-delimiters
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
