@@ -154,6 +154,19 @@ value of the symbol."
 
 (use-package avy :ensure t)
 
+;; evil-leader must be enabled before evil, otherwise evil-leader
+;; won't be enabled in initial buffer (*scratch*, *Messages*, ...)
+(use-package evil-leader
+  :ensure t
+  :demand
+  :config
+  (evil-leader/set-leader "<SPC>")
+  (evil-leader/set-key
+   "j" 'evil-avy-goto-char
+   "k" 'evil-avy-goto-word-0
+   "g" 'evil-avy-goto-line)
+  (global-evil-leader-mode))
+
 (use-package evil
   :ensure t
   :config
