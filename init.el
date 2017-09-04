@@ -152,6 +152,8 @@ value of the symbol."
   :config
   (my/setq custom-enabled-themes '(tangotango)))
 
+(use-package avy :ensure t)
+
 (use-package evil
   :ensure t
   :config
