@@ -455,16 +455,8 @@ value of the symbol."
   (my/setq popwin:reuse-window nil)
   (add-to-list 'popwin:special-display-config
                '("^\\*Man .*\\*$" :regexp t :width 80 :position right))
-  (defun my/popwin-help-mode-off ()
-    "Turn `popwin-mode' off for *Help* buffers."
-    (when (boundp 'popwin:special-display-config)
-      (delq 'help-mode popwin:special-display-config)))
-  (defun my/popwin-help-mode-on ()
-    "Turn `popwin-mode' on for *Help* buffers."
-    (when (boundp 'popwin:special-display-config)
-      (add-to-list 'popwin:special-display-config 'help-mode nil #'eq)))
-  (add-hook 'helm-minibuffer-set-up-hook #'my/popwin-help-mode-off)
-  (add-hook 'helm-cleanup-hook #'my/popwin-help-mode-on)
+  (add-hook 'helm-after-initialize-hook (lambda () (popwin-mode -1)))
+  (add-hook 'helm-cleanup-hook (lambda () (popwin-mode 1)))
   (popwin-mode))
 
 (use-package rainbow-delimiters
