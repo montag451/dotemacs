@@ -165,7 +165,11 @@ value of the symbol."
   :config
   (my/setq custom-enabled-themes '(tangotango)))
 
-(use-package avy :ensure t)
+(use-package avy
+  :ensure t
+  :config
+  (my/setq avy-keys (number-sequence ?a ?z))
+  (my/setq avy-case-fold-search nil))
 
 ;; evil-leader must be enabled before evil, otherwise evil-leader
 ;; won't be enabled in initial buffer (*scratch*, *Messages*, ...)
