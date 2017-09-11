@@ -463,3 +463,9 @@ value of the symbol."
   :ensure t
   :config
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+
+(use-package aggressive-indent
+  :ensure t
+  :defer t
+  :init
+  (add-hook 'prog-mode-hook 'aggressive-indent-mode))
