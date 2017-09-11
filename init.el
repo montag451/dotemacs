@@ -1,3 +1,5 @@
+;;; init.el --- my Emacs configuration. -*- lexical-binding: t -*-
+
 ;; helper functions and macros
 (defmacro my/setq (&rest args)
   "A macro that behaves like `setq' except when a symbol has been defined
@@ -145,7 +147,18 @@ value of the symbol."
 (use-package shell
   :defer t
   :config
-  (my/setq shell-font-lock-keywords nil))
+  (my/setq shell-font-lock-keywords nil)
+  (add-hook 'shell-mode-hook
+            (lambda ()
+              (let ((proc (get-buffer-process (current-buffer))))
+                (add-function :after (process-sentinel proc)
+                              (lambda (proc _event)
+                                (let* ((buf (process-buffer proc))
+                                       (win (get-buffer-window buf)))
+                                  (unless (process-live-p proc)
+                                    (ignore-errors
+                                      (delete-window win))
+                                    (kill-buffer buf)))))))))
 
 (use-package tangotango-theme
   :ensure t
