@@ -144,21 +144,29 @@ value of the symbol."
   (my/setq dired-recursive-copies 'always)
   (my/setq dired-recursive-deletes 'always))
 
+(use-package comint
+  :defer t
+  :config
+  (defun my/comint-clean-up-on-exit (buffer)
+    "Kill BUFFER and its window if it's displayed.
+When the inferior process of BUFFER is not live anymore, its
+window is deleted if it's displayed and BUFFER is killed."
+    (let ((proc (get-buffer-process buffer)))
+      (add-function :after (process-sentinel proc)
+                    (lambda (proc _event)
+                      (let* ((buf (process-buffer proc))
+                             (win (get-buffer-window buf)))
+                        (unless (process-live-p proc)
+                          (ignore-errors
+                            (delete-window win))
+                          (kill-buffer buf)))))
+      buffer))
+  (advice-add 'make-comint-in-buffer :filter-return 'my/comint-clean-up-on-exit))
+
 (use-package shell
   :defer t
   :config
-  (my/setq shell-font-lock-keywords nil)
-  (add-hook 'shell-mode-hook
-            (lambda ()
-              (let ((proc (get-buffer-process (current-buffer))))
-                (add-function :after (process-sentinel proc)
-                              (lambda (proc _event)
-                                (let* ((buf (process-buffer proc))
-                                       (win (get-buffer-window buf)))
-                                  (unless (process-live-p proc)
-                                    (ignore-errors
-                                      (delete-window win))
-                                    (kill-buffer buf)))))))))
+  (my/setq shell-font-lock-keywords nil))
 
 (use-package tangotango-theme
   :ensure t
