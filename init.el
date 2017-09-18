@@ -19,6 +19,13 @@ value of the symbol."
                 def))))
     `(progn ,@(reverse def))))
 
+(defun my/spawn-shell (dir)
+  "Spawn a shell using DIR as the default directory."
+  (interactive "fDefault directory: ")
+  (let ((default-directory dir)
+        (buffer (generate-new-buffer-name "*shell*")))
+    (shell buffer)))
+
 ;; initialize package.el machinery
 (require 'package)
 (add-to-list 'package-archives
