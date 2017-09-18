@@ -173,6 +173,8 @@ window is deleted if it's displayed and BUFFER is killed."
 (use-package shell
   :defer t
   :config
+  (my/setq shell-file-name "/usr/bin/env")
+  (my/setq explicit-env-args (nconc '("bash") explicit-bash-args))
   (my/setq shell-font-lock-keywords nil))
 
 (use-package tangotango-theme
