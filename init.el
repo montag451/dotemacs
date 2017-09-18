@@ -19,12 +19,21 @@ value of the symbol."
                 def))))
     `(progn ,@(reverse def))))
 
-(defun my/spawn-shell (dir)
-  "Spawn a shell using DIR as the default directory."
-  (interactive "fDefault directory: ")
-  (let ((default-directory dir)
-        (buffer (generate-new-buffer-name "*shell*")))
-    (shell buffer)))
+
+(defun my/spawn-shell (dir &optional force)
+  "Spawn a shell using DIR as the default directory.
+If FORCE is non-nil a new shell will be spawned even if one for
+the same user and the same host already exists. When called
+interactively with a prefix arg, FORCE is set to a non-nil
+value."
+  (interactive "DDefault directory: \nP")
+  (let* ((default-directory dir)
+         (user (or (file-remote-p dir 'user) (user-login-name)))
+         (host (or (file-remote-p dir 'host) "localhost"))
+         (buffer (format "*shell %s@%s*" user host)))
+    (shell (if force
+               (generate-new-buffer-name buffer)
+             buffer))))
 
 ;; initialize package.el machinery
 (require 'package)
