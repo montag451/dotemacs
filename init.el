@@ -19,21 +19,10 @@ value of the symbol."
                 def))))
     `(progn ,@(reverse def))))
 
-
-(defun my/spawn-shell (dir &optional force)
-  "Spawn a shell using DIR as the default directory.
-If FORCE is non-nil a new shell will be spawned even if one for
-the same user and the same host already exists. When called
-interactively with a prefix arg, FORCE is set to a non-nil
-value."
-  (interactive "DDefault directory: \nP")
-  (let* ((default-directory dir)
-         (user (or (file-remote-p dir 'user) (user-login-name)))
-         (host (or (file-remote-p dir 'host) "localhost"))
-         (buffer (format "*shell %s@%s*" user host)))
-    (shell (if force
-               (generate-new-buffer-name buffer)
-             buffer))))
+;; global variables
+(defvar my/plantuml-jar-path
+  (expand-file-name (concat user-emacs-directory "plantuml.8057.jar"))
+  "Path of the plantuml jar file")
 
 ;; initialize package.el machinery
 (require 'package)
@@ -182,8 +171,6 @@ window is deleted if it's displayed and BUFFER is killed."
 (use-package shell
   :defer t
   :config
-  (my/setq shell-file-name "/usr/bin/env")
-  (my/setq explicit-env-args (nconc '("bash") explicit-bash-args))
   (my/setq shell-font-lock-keywords nil))
 
 (use-package tangotango-theme
@@ -477,7 +464,7 @@ window is deleted if it's displayed and BUFFER is killed."
   :ensure t
   :demand
   :config
-  (global-set-key (kbd "C-c s") popwin:keymap)
+  (global-set-key (kbd "C-c w") popwin:keymap)
   (my/setq popwin:reuse-window nil)
   (add-to-list 'popwin:special-display-config
                '("^\\*Man .*\\*$" :regexp t :width 80 :position right))
@@ -495,3 +482,50 @@ window is deleted if it's displayed and BUFFER is killed."
   :defer t
   :init
   (add-hook 'prog-mode-hook 'aggressive-indent-mode))
+
+(defun my/list-buffers-with-mode (mode)
+  "List all buffers with `major-mode' MODE.
+MODE is a symbol."
+  (save-current-buffer
+    (let (bufs)
+      (dolist (buf (buffer-list))
+        (set-buffer buf)
+        (and (equal major-mode mode)
+             (push (buffer-name buf) bufs)))
+      (nreverse bufs))))
+
+(defun my/helm-switch-to-shell-buffer ()
+  (interactive)
+  (switch-to-buffer
+   (helm-comp-read
+    "Switch to shell buffer: "
+    (my/list-buffers-with-mode 'shell-mode)
+    :name "Shell buffers")))
+
+(defun my/spawn-shell (dir &optional force)
+  "Spawn a shell using DIR as the default directory.
+If FORCE is non-nil a new shell will be spawned even if one for
+the same user and the same host already exists. When called
+interactively with a prefix arg, FORCE is set to a non-nil
+value."
+  (interactive "DDefault directory: \nP")
+  (require 'shell)
+  (defvar explicit-env-args nil)
+  (let* ((default-directory dir)
+         (user (or (file-remote-p dir 'user) (user-login-name)))
+         (host (or (file-remote-p dir 'host) system-name))
+         (buffer (format "*shell %s@%s*" user host))
+         (shell-file-name "/usr/bin/env")
+         (explicit-env-args (cons "bash" explicit-bash-args)))
+    (shell (if force
+               (generate-new-buffer-name buffer)
+             buffer))))
+
+(defun my/spawn-shell-same-window (dir &optional force)
+  (interactive "DDefault directory: \nP")
+  (let ((display-buffer-overriding-action '(display-buffer-same-window)))
+    (my/spawn-shell dir force)))
+
+(global-set-key (kbd "C-c s s") 'my/helm-switch-to-shell-buffer)
+(global-set-key (kbd "C-c s p") 'my/spawn-shell)
+(global-set-key (kbd "C-c s x") 'my/spawn-shell-same-window)
