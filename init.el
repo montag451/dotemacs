@@ -5,7 +5,7 @@
   "A macro that behaves like `setq' except when a symbol has been defined
 using `defcustom'. In this case, it uses `customize-set-variable' to set the
 value of the symbol."
-  (let ((def '()))
+  (let (def)
     (while args
       (let ((sym (pop args)))
         (unless (symbolp sym)
@@ -17,7 +17,7 @@ value of the symbol."
                      (customize-set-variable ',sym ,val)
                    (setq ,sym ,val))
                 def))))
-    `(progn ,@(reverse def))))
+    `(progn ,@(nreverse def))))
 
 ;; global variables
 (defvar my/plantuml-jar-path
@@ -32,13 +32,10 @@ value of the symbol."
 
 ;; install and configure use-package
 (unless (package-installed-p 'use-package)
-    (progn
-      (package-refresh-contents)
-      (package-install 'use-package t)))
+  (progn
+    (package-refresh-contents)
+    (package-install 'use-package t)))
 (my/setq use-package-verbose t)
-
-;; global variables
-(my/setq my/plantuml-jar-path (expand-file-name (concat user-emacs-directory "plantuml.8057.jar")))
 
 ;; no startup screen please
 (my/setq inhibit-startup-screen t)
@@ -73,8 +70,9 @@ value of the symbol."
 
 ;; set and load custom-file
 (my/setq custom-file (concat user-emacs-directory "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file))
+(load custom-file t)
+
+;;; builtin packages
 
 (use-package help
   :defer t
@@ -173,6 +171,27 @@ window is deleted if it's displayed and BUFFER is killed."
   :config
   (my/setq shell-font-lock-keywords nil))
 
+(use-package whitespace
+  :defer t
+  :init
+  (add-hook 'prog-mode-hook 'whitespace-mode)
+  (add-hook 'text-mode-hook 'whitespace-mode)
+  :config
+  (my/setq whitespace-line-column 80)
+  (my/setq whitespace-style '(face tabs empty trailing lines-tail)))
+
+(use-package term
+  :defer t
+  :config
+  (add-hook 'term-mode-hook
+            (lambda ()
+              (define-key
+                evil-emacs-state-local-map
+                (kbd "C-z")
+                'term-send-raw))))
+
+;;; external packages
+
 (use-package tangotango-theme
   :ensure t
   :config
@@ -192,16 +211,16 @@ window is deleted if it's displayed and BUFFER is killed."
   :config
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
-   "j" 'evil-avy-goto-char
-   "k" 'evil-avy-goto-word-0
-   "g" 'evil-avy-goto-line)
+    "j" 'evil-avy-goto-char
+    "k" 'evil-avy-goto-word-0
+    "g" 'evil-avy-goto-line)
   (global-evil-leader-mode))
 
 (use-package evil
   :ensure t
   :config
   (defun my/fix-evil-hiding-minor-mode-map (&rest _args)
-    "See https://github.com/syl20bnr/spacemacs/issues/9391"
+    "See `https://github.com/syl20bnr/spacemacs/issues/9391'"
     (let ((mjm-keymap (intern-soft (format "%s-map" major-mode))))
       (when mjm-keymap
         (setq evil-mode-map-alist
@@ -441,25 +460,6 @@ window is deleted if it's displayed and BUFFER is killed."
   :config
   (which-key-mode))
 
-(use-package whitespace
-  :defer t
-  :init
-  (add-hook 'prog-mode-hook 'whitespace-mode)
-  (add-hook 'text-mode-hook 'whitespace-mode)
-  :config
-  (my/setq whitespace-line-column 80)
-  (my/setq whitespace-style '(face tabs empty trailing lines-tail)))
-
-(use-package term
-  :defer t
-  :config
-  (add-hook 'term-mode-hook
-            (lambda ()
-              (define-key
-                evil-emacs-state-local-map
-                (kbd "C-z")
-                'term-send-raw))))
-
 (use-package popwin
   :ensure t
   :demand
@@ -482,6 +482,8 @@ window is deleted if it's displayed and BUFFER is killed."
   :defer t
   :init
   (add-hook 'prog-mode-hook 'aggressive-indent-mode))
+
+;;; handy functions
 
 (defun my/list-buffers-with-mode (mode)
   "List all buffers with `major-mode' MODE.
