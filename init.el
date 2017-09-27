@@ -193,6 +193,11 @@ window is deleted if it's displayed and BUFFER is killed."
                 (kbd "C-z")
                 'term-send-raw))))
 
+(use-package compile
+  :defer t
+  :config
+  (my/setq compilation-scroll-output 'first-error))
+
 ;;; external packages
 
 (use-package tangotango-theme
