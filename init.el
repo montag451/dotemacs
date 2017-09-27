@@ -145,7 +145,10 @@ value of the symbol."
   :defer t
   :config
   (my/setq dired-recursive-copies 'always)
-  (my/setq dired-recursive-deletes 'always))
+  (my/setq dired-recursive-deletes 'always)
+  (my/setq dired-dwim-target t))
+
+(use-package dired-x :after dired)
 
 (use-package comint
   :defer t
