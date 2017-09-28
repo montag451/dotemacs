@@ -64,6 +64,12 @@ value of the symbol."
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 
+;; set font
+(when window-system
+  (let ((font (car (x-list-fonts "Ubuntu Mono-14:style=Regular:weight=normal:slant=normal"))))
+    (when font
+      (add-to-list 'default-frame-alist (cons 'font font)))))
+
 ;; resize all the windows of a combination when one window of the
 ;; combination is deleted, it helps keeping the layout of frames
 (my/setq window-combination-resize t)
@@ -200,10 +206,13 @@ window is deleted if it's displayed and BUFFER is killed."
 
 ;;; external packages
 
-(use-package tangotango-theme
+(use-package solarized-theme
   :ensure t
+  :init
+  (my/setq solarized-use-variable-pitch nil)
+  (my/setq solarized-scale-org-headlines nil)
   :config
-  (my/setq custom-enabled-themes '(tangotango)))
+  (load-theme 'solarized-dark t))
 
 (use-package avy
   :ensure t
