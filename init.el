@@ -204,6 +204,11 @@ window is deleted if it's displayed and BUFFER is killed."
   :config
   (my/setq compilation-scroll-output 'first-error))
 
+(use-package ange-ftp
+  :defer t
+  :config
+  (my/setq ange-ftp-try-passive-mode t))
+
 ;;; external packages
 
 (use-package solarized-theme
