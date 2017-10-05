@@ -211,13 +211,10 @@ window is deleted if it's displayed and BUFFER is killed."
 
 ;;; external packages
 
-(use-package solarized-theme
+(use-package zenburn-theme
   :ensure t
-  :init
-  (my/setq solarized-use-variable-pitch nil)
-  (my/setq solarized-scale-org-headlines nil)
   :config
-  (load-theme 'solarized-dark t))
+  (load-theme 'zenburn t))
 
 (use-package avy
   :ensure t
