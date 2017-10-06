@@ -360,6 +360,12 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq projectile-use-git-grep t)
   (projectile-mode))
 
+(use-package helm-projectile
+  :ensure t
+  :after helm projectile
+  :config
+  (helm-projectile-on))
+
 (use-package magit
   :ensure t
   :bind (("C-x g" . magit-status)
