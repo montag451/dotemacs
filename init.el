@@ -506,7 +506,8 @@ window is deleted if it's displayed and BUFFER is killed."
   :ensure t
   :defer t
   :init
-  (add-hook 'prog-mode-hook 'aggressive-indent-mode))
+  (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode)
+  (add-hook 'lisp-mode-hook 'aggressive-indent-mode))
 
 ;;; handy functions
 
