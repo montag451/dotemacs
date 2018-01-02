@@ -257,6 +257,7 @@ window is deleted if it's displayed and BUFFER is killed."
   (evil-set-initial-state 'dired-mode 'emacs)
   (evil-set-initial-state 'gud-mode 'emacs)
   (evil-set-initial-state 'inferior-python-mode 'emacs)
+  (evil-set-initial-state 'erlang-shell-mode 'emacs)
   (evil-set-initial-state 'haskell-interactive-mode 'emacs)
   (evil-set-initial-state 'haskell-error-mode 'emacs)
   (evil-set-initial-state 'image-mode 'emacs)
@@ -511,7 +512,13 @@ window is deleted if it's displayed and BUFFER is killed."
   (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode)
   (add-hook 'lisp-mode-hook 'aggressive-indent-mode))
 
-;;; handy functions
+(use-package erlang
+  :ensure t
+  :defer t
+  :config
+  (my/setq inferior-erlang-machine-options '("-sname" "emacs")))
+
+;; handy functions
 
 (defun my/list-buffers-with-mode (mode)
   "List all buffers with `major-mode' MODE.
