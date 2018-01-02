@@ -152,7 +152,8 @@ value of the symbol."
   :config
   (my/setq dired-recursive-copies 'always)
   (my/setq dired-recursive-deletes 'always)
-  (my/setq dired-dwim-target t))
+  (my/setq dired-dwim-target t)
+  (my/setq dired-keep-marker-copy nil))
 
 (use-package dired-x :after dired)
 
