@@ -471,7 +471,8 @@ window is deleted if it's displayed and BUFFER is killed."
   :config
   (my/setq org-use-speed-commands t)
   (my/setq org-babel-load-languages '((plantuml . t)
-                                      (emacs-lisp . t))))
+                                      (emacs-lisp . t)
+                                      (gnuplot . t))))
 
 (use-package ob-plantuml
   :defer t
