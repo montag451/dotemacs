@@ -46,6 +46,8 @@ value of the symbol."
 ;; tabulations are evil
 (my/setq indent-tabs-mode nil)
 
+(my/setq tab-always-indent 'complete)
+
 (my/setq frame-title-format
          '((:eval (if (buffer-file-name)
                       (abbreviate-file-name (buffer-file-name))
@@ -114,10 +116,6 @@ value of the symbol."
   :defer t
   :config
   (add-hook 'ediff-quit-hook 'winner-undo t))
-
-(use-package indents
-  :config
-  (my/setq tab-always-indent 'complete))
 
 (use-package hippie-exp
   :bind ("M-/" . hippie-expand))
