@@ -3,8 +3,8 @@
 ;;; Code:
 (add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "restclient-helm" "restclient-helm.el" (22932
-;;;;;;  28385 277036 469000))
+;;;### (autoloads nil "restclient-helm" "restclient-helm.el" (23161
+;;;;;;  33305 494832 610000))
 ;;; Generated autoloads from restclient-helm.el
 
 (autoload 'helm-restclient "restclient-helm" "\

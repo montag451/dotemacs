@@ -1,2 +1,2 @@
 ;;; -*- no-byte-compile: t -*-
-(define-package "restclient-helm" "20170314.854" "helm interface for restclient.el" '((restclient "0") (helm "1.9.4")) :commit "ef6d756e2013843f7afcbea42b69ad54aa5de518" :keywords '("http" "helm"))
+(define-package "restclient-helm" "20170314.854" "helm interface for restclient.el" '((restclient "0") (helm "1.9.4")) :commit "0ce4513a6b5ff1e63c73fda30f11efdb7a296c38" :keywords '("http" "helm"))

@@ -3,7 +3,7 @@
 ;;; Code:
 (add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "ox-gfm" "ox-gfm.el" (22932 28387 80060 802000))
+;;;### (autoloads nil "ox-gfm" "ox-gfm.el" (23161 33307 541859 161000))
 ;;; Generated autoloads from ox-gfm.el
 
 (autoload 'org-gfm-export-as-markdown "ox-gfm" "\
