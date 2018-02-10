@@ -516,7 +516,9 @@ window is deleted if it's displayed and BUFFER is killed."
   :config
   (my/setq inferior-erlang-machine-options '("-sname" "emacs")))
 
-;; handy functions
+(use-package php-mode :ensure t :defer t)
+
+;;; handy functions
 
 (defun my/list-buffers-with-mode (mode)
   "List all buffers with `major-mode' MODE.
