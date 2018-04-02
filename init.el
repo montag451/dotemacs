@@ -80,6 +80,10 @@ value of the symbol."
 (my/setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file t)
 
+;; make Emacs case sensitive when searching/replacing/completing
+(my/setq case-fold-search nil)
+(my/setq case-replace nil)
+
 ;;; builtin packages
 
 (use-package help
