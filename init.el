@@ -543,6 +543,17 @@ window is deleted if it's displayed and BUFFER is killed."
 
 (use-package php-mode :ensure t :defer t)
 
+(use-package bash-completion
+  :ensure t
+  :defer t
+  :init
+  (add-to-list 'shell-dynamic-complete-functions 'bash-completion-dynamic-complete)
+  :config
+  (my/setq bash-completion-prog "/usr/bin/env")
+  (my/setq bash-completion-args '("bash" "--noediting" "-l" "-i"))
+  (my/setq bash-completion-default-completion nil)
+  (my/setq bash-completion-enable-caching t))
+
 ;;; handy functions
 
 (defun my/list-buffers-with-mode (mode)
