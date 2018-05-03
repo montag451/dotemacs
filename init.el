@@ -84,6 +84,10 @@ value of the symbol."
 (my/setq case-fold-search nil)
 (my/setq case-replace nil)
 
+;; install diminish before configuring other packages
+(use-package diminish
+  :ensure t)
+
 ;;; builtin packages
 
 (use-package help
@@ -186,6 +190,7 @@ window is deleted if it's displayed and BUFFER is killed."
 
 (use-package whitespace
   :defer t
+  :diminish
   :init
   (add-hook 'prog-mode-hook 'whitespace-mode)
   (add-hook 'text-mode-hook 'whitespace-mode)
@@ -212,6 +217,8 @@ window is deleted if it's displayed and BUFFER is killed."
   :defer t
   :config
   (my/setq ange-ftp-try-passive-mode t))
+
+(use-package eldoc :diminish)
 
 ;;; external packages
 
@@ -266,8 +273,14 @@ window is deleted if it's displayed and BUFFER is killed."
   (evil-set-initial-state 'image-mode 'emacs)
   (evil-mode))
 
+(use-package undo-tree
+  :defer t
+  :config
+  (my/setq undo-tree-mode-lighter ""))
+
 (use-package helm
   :ensure t
+  :diminish
   :demand
   :init
   (require 'helm-config)
@@ -323,7 +336,9 @@ window is deleted if it's displayed and BUFFER is killed."
   (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
   (add-hook 'ielm-mode-hook 'paredit-mode)
   (add-hook 'lisp-mode-hook 'paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook 'paredit-mode))
+  (add-hook 'eval-expression-minibuffer-setup-hook 'paredit-mode)
+  :config
+  (my/setq paredit-lighter ""))
 
 (use-package evil-paredit
   :ensure t
@@ -337,6 +352,7 @@ window is deleted if it's displayed and BUFFER is killed."
   :init
   (add-hook 'after-init-hook 'global-company-mode)
   :config
+  (my/setq company-lighter "")
   (my/setq company-show-numbers t))
 
 (use-package company-quickhelp
@@ -430,7 +446,9 @@ window is deleted if it's displayed and BUFFER is killed."
   :defer t
   :init
   (add-hook 'python-mode-hook 'anaconda-mode)
-  (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
+  (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+  :config
+  (my/setq anaconda-mode-lighter ""))
 
 (use-package haskell-mode
   :ensure t
@@ -489,6 +507,7 @@ window is deleted if it's displayed and BUFFER is killed."
 (use-package which-key
   :ensure t
   :config
+  (my/setq which-key-lighter "")
   (which-key-mode))
 
 (use-package popwin
@@ -510,6 +529,7 @@ window is deleted if it's displayed and BUFFER is killed."
 
 (use-package aggressive-indent
   :ensure t
+  :diminish
   :defer t
   :init
   (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode)
