@@ -462,10 +462,7 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq haskell-hoogle-url "http://hoogle.haskell.org/?hoogle=%s")
   (my/setq haskell-process-type 'stack-ghci))
 
-(use-package nix-mode
-  :load-path  "external/nix-mode"
-  :mode (("\\.nix\\'" . nix-mode)
-         ("\\.nix.in\\'" . nix-mode)))
+(use-package nix-mode :ensure t :defer t)
 
 (use-package plantuml-mode
   :ensure t
