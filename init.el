@@ -57,7 +57,7 @@ value of the symbol."
 (blink-cursor-mode -1)
 
 ;; disable the bell, it drives me crazy
-(my/setq ring-bell-function 'ignore)
+(my/setq ring-bell-function #'ignore)
 
 ;; save some screen estate
 (menu-bar-mode -1)
@@ -118,12 +118,12 @@ value of the symbol."
 (use-package ediff-wind
   :defer t
   :config
-  (my/setq ediff-window-setup-function 'ediff-setup-windows-plain ))
+  (my/setq ediff-window-setup-function #'ediff-setup-windows-plain))
 
 (use-package ediff-init
   :defer t
   :config
-  (add-hook 'ediff-quit-hook 'winner-undo t))
+  (add-hook 'ediff-quit-hook #'winner-undo t))
 
 (use-package hippie-exp
   :bind ("M-/" . hippie-expand))
@@ -181,7 +181,7 @@ window is deleted if it's displayed and BUFFER is killed."
                               (delete-window win)))
                           (kill-buffer buf)))))
       buffer))
-  (advice-add 'make-comint-in-buffer :filter-return 'my/comint-clean-up-on-exit))
+  (advice-add 'make-comint-in-buffer :filter-return #'my/comint-clean-up-on-exit))
 
 (use-package shell
   :defer t
@@ -192,8 +192,8 @@ window is deleted if it's displayed and BUFFER is killed."
   :defer t
   :diminish
   :init
-  (add-hook 'prog-mode-hook 'whitespace-mode)
-  (add-hook 'text-mode-hook 'whitespace-mode)
+  (add-hook 'prog-mode-hook #'whitespace-mode)
+  (add-hook 'text-mode-hook #'whitespace-mode)
   :config
   (my/setq whitespace-line-column 80)
   (my/setq whitespace-style '(face tabs empty trailing lines-tail)))
@@ -315,28 +315,28 @@ window is deleted if it's displayed and BUFFER is killed."
   (add-hook 'prog-mode-hook
             (lambda ()
               (let ((map evil-normal-state-local-map))
-                (define-key map (kbd "C-]") 'helm-gtags-dwim)
-                (define-key map (kbd "C-t") 'helm-gtags-pop-stack))
+                (define-key map (kbd "C-]") #'helm-gtags-dwim)
+                (define-key map (kbd "C-t") #'helm-gtags-pop-stack))
               (helm-gtags-mode)))
   :config
   (my/setq helm-gtags-mode-name "")
   (let ((map helm-gtags-mode-map))
-    (define-key map (kbd "C-c g s") 'helm-gtags-select)
-    (define-key map (kbd "C-c g f") 'helm-gtags-select-path)
-    (define-key map (kbd "C-c g u") 'helm-gtags-update-tags)
-    (define-key map (kbd "C-c g t") 'helm-gtags-show-stack)
-    (define-key map (kbd "C-c g r") 'helm-gtags-resume)
-    (define-key map (kbd "C-c g j") 'helm-gtags-next-history)
-    (define-key map (kbd "C-c g k") 'helm-gtags-previous-history)))
+    (define-key map (kbd "C-c g s") #'helm-gtags-select)
+    (define-key map (kbd "C-c g f") #'helm-gtags-select-path)
+    (define-key map (kbd "C-c g u") #'helm-gtags-update-tags)
+    (define-key map (kbd "C-c g t") #'helm-gtags-show-stack)
+    (define-key map (kbd "C-c g r") #'helm-gtags-resume)
+    (define-key map (kbd "C-c g j") #'helm-gtags-next-history)
+    (define-key map (kbd "C-c g k") #'helm-gtags-previous-history)))
 
 (use-package paredit
   :ensure t
   :defer t
   :init
-  (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
-  (add-hook 'ielm-mode-hook 'paredit-mode)
-  (add-hook 'lisp-mode-hook 'paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook 'paredit-mode)
+  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
+  (add-hook 'ielm-mode-hook #'paredit-mode)
+  (add-hook 'lisp-mode-hook #'paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
   :config
   (my/setq paredit-lighter ""))
 
@@ -344,13 +344,13 @@ window is deleted if it's displayed and BUFFER is killed."
   :ensure t
   :defer t
   :init
-  (add-hook 'emacs-lisp-mode-hook 'evil-paredit-mode))
+  (add-hook 'emacs-lisp-mode-hook #'evil-paredit-mode))
 
 (use-package company
   :ensure t
   :defer t
   :init
-  (add-hook 'after-init-hook 'global-company-mode)
+  (add-hook 'after-init-hook #'global-company-mode)
   :config
   (my/setq company-lighter "")
   (my/setq company-show-numbers t))
@@ -365,13 +365,13 @@ window is deleted if it's displayed and BUFFER is killed."
   :ensure t
   :after company
   :config
-  (add-to-list 'company-backends 'company-restclient))
+  (add-to-list 'company-backends #'company-restclient))
 
 (use-package company-anaconda
   :ensure t
   :after company
   :config
-  (add-to-list 'company-backends 'company-anaconda))
+  (add-to-list 'company-backends #'company-anaconda))
 
 (use-package projectile
   :ensure t
@@ -445,8 +445,8 @@ window is deleted if it's displayed and BUFFER is killed."
   :ensure t
   :defer t
   :init
-  (add-hook 'python-mode-hook 'anaconda-mode)
-  (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+  (add-hook 'python-mode-hook #'anaconda-mode)
+  (add-hook 'python-mode-hook #'anaconda-eldoc-mode)
   :config
   (my/setq anaconda-mode-lighter ""))
 
@@ -454,10 +454,10 @@ window is deleted if it's displayed and BUFFER is killed."
   :ensure t
   :defer t
   :config
-  (add-hook 'haskell-mode-hook 'subword-mode)
-  (add-hook 'haskell-mode-hook 'haskell-doc-mode)
-  (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
-  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+  (add-hook 'haskell-mode-hook #'subword-mode)
+  (add-hook 'haskell-mode-hook #'haskell-doc-mode)
+  (add-hook 'haskell-mode-hook #'haskell-indentation-mode)
+  (add-hook 'haskell-mode-hook #'interactive-haskell-mode)
   (my/setq haskell-hoogle-command nil)
   (my/setq haskell-hoogle-url "http://hoogle.haskell.org/?hoogle=%s")
   (my/setq haskell-process-type 'stack-ghci))
@@ -522,15 +522,15 @@ window is deleted if it's displayed and BUFFER is killed."
 (use-package rainbow-delimiters
   :ensure t
   :config
-  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
 (use-package aggressive-indent
   :ensure t
   :diminish
   :defer t
   :init
-  (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode)
-  (add-hook 'lisp-mode-hook 'aggressive-indent-mode))
+  (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
+  (add-hook 'lisp-mode-hook #'aggressive-indent-mode))
 
 (use-package erlang
   :ensure t
@@ -544,7 +544,7 @@ window is deleted if it's displayed and BUFFER is killed."
   :ensure t
   :defer t
   :init
-  (add-to-list 'shell-dynamic-complete-functions 'bash-completion-dynamic-complete)
+  (add-to-list 'shell-dynamic-complete-functions #'bash-completion-dynamic-complete)
   :config
   (my/setq bash-completion-prog "/usr/bin/env")
   (my/setq bash-completion-args '("bash" "--noediting" "-l" "-i"))
@@ -596,6 +596,6 @@ value."
   (let ((display-buffer-overriding-action '(display-buffer-same-window)))
     (my/spawn-shell dir force)))
 
-(global-set-key (kbd "C-c s s") 'my/helm-switch-to-shell-buffer)
-(global-set-key (kbd "C-c s p") 'my/spawn-shell)
-(global-set-key (kbd "C-c s x") 'my/spawn-shell-same-window)
+(global-set-key (kbd "C-c s s") #'my/helm-switch-to-shell-buffer)
+(global-set-key (kbd "C-c s p") #'my/spawn-shell)
+(global-set-key (kbd "C-c s x") #'my/spawn-shell-same-window)
