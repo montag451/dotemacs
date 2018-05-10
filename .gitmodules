@@ -1,0 +1,176 @@
+[submodule "aggressive-indent"]
+	path = lib/aggressive-indent
+	url = git@github.com:Malabarba/aggressive-indent-mode.git
+[submodule "anaconda-mode"]
+	path = lib/anaconda-mode
+	url = git@github.com:proofit404/anaconda-mode.git
+[submodule "async"]
+	path = lib/async
+	url = git@github.com:jwiegley/emacs-async.git
+[submodule "auto-compile"]
+	path = lib/auto-compile
+	url = git@github.com:emacscollective/auto-compile.git
+[submodule "avy"]
+	path = lib/avy
+	url = git@github.com:abo-abo/avy.git
+[submodule "bash-completion"]
+	path = lib/bash-completion
+	url = git@github.com:szermatt/emacs-bash-completion.git
+[submodule "borg"]
+	path = lib/borg
+	url = https://github.com/emacscollective/borg.git
+[submodule "closql"]
+	path = lib/closql
+	url = https://github.com/emacscollective/closql.git
+[submodule "cmake-mode"]
+	path = lib/cmake-mode
+	url = git@github.com:emacsmirror/cmake-mode.git
+[submodule "company"]
+	path = lib/company
+	url = git@github.com:company-mode/company-mode.git
+[submodule "company-anaconda"]
+	path = lib/company-anaconda
+	url = git@github.com:proofit404/company-anaconda.git
+[submodule "company-quickhelp"]
+	path = lib/company-quickhelp
+	url = git@github.com:expez/company-quickhelp.git
+[submodule "company-restclient"]
+	path = lib/company-restclient
+	url = git@github.com:iquiw/company-restclient.git
+[submodule "dash"]
+	path = lib/dash
+	url = git@github.com:magnars/dash.el.git
+[submodule "diminish"]
+	path = lib/diminish
+	url = git@github.com:myrjola/diminish.el.git
+[submodule "emacsql"]
+	path = lib/emacsql
+	url = https://github.com/skeeto/emacsql.git
+[submodule "epkg"]
+	path = lib/epkg
+	url = https://github.com/emacscollective/epkg.git
+[submodule "erlang"]
+	path = lib/erlang
+	url = git@github.com:erlang/otp.git
+	load-path = lib/tools/emacs
+[submodule "evil"]
+	path = lib/evil
+	url = git@github.com:emacs-evil/evil.git
+[submodule "evil-leader"]
+	path = lib/evil-leader
+	url = git@github.com:cofi/evil-leader.git
+[submodule "evil-paredit"]
+	path = lib/evil-paredit
+	url = git@github.com:roman/evil-paredit.git
+[submodule "f"]
+	path = lib/f
+	url = git@github.com:rejeep/f.el.git
+[submodule "ghub"]
+	path = lib/ghub
+	url = git@github.com:magit/ghub.git
+[submodule "haskell-mode"]
+	path = lib/haskell-mode
+	url = git@github.com:haskell/haskell-mode.git
+[submodule "helm"]
+	path = lib/helm
+	url = git@github.com:emacs-helm/helm.git
+[submodule "helm-gtags"]
+	path = lib/helm-gtags
+	url = git@github.com:syohex/emacs-helm-gtags.git
+[submodule "helm-lxc"]
+	path = lib/helm-lxc
+	url = git+ssh://github.com/montag451/dotemacs.git
+[submodule "helm-projectile"]
+	path = lib/helm-projectile
+	url = git@github.com:bbatsov/helm-projectile.git
+[submodule "htmlize"]
+	path = lib/htmlize
+	url = git@github.com:hniksic/emacs-htmlize.git
+[submodule "hydra"]
+	path = lib/hydra
+	url = git@github.com:abo-abo/hydra.git
+[submodule "jinja2-mode"]
+	path = lib/jinja2-mode
+	url = git@github.com:paradoxxxzero/jinja2-mode.git
+[submodule "know-your-http-well"]
+	path = lib/know-your-http-well
+	url = git@github.com:for-GET/know-your-http-well.git
+	load-path = emacs
+[submodule "lxc-tramp"]
+	path = lib/lxc-tramp
+	url = git@github.com:montag451/lxc-tramp.git
+[submodule "magit"]
+	path = lib/magit
+	url = git@github.com:magit/magit.git
+[submodule "magit-popup"]
+	path = lib/magit-popup
+	url = git@github.com:magit/magit-popup.git
+[submodule "markdown-mode"]
+	path = lib/markdown-mode
+	url = git@github.com:jrblevin/markdown-mode.git
+[submodule "mmm-mode"]
+	path = lib/mmm-mode
+	url = git@github.com:purcell/mmm-mode.git
+[submodule "multi-term"]
+	path = lib/multi-term
+	url = git@github.com:emacsorphanage/multi-term.git
+[submodule "nix-mode"]
+	path = lib/nix-mode
+	url = git@github.com:NixOS/nix-mode.git
+[submodule "ox-gfm"]
+	path = lib/ox-gfm
+	url = git@github.com:larstvei/ox-gfm.git
+[submodule "packed"]
+	path = lib/packed
+	url = git@github.com:emacscollective/packed.git
+[submodule "paredit"]
+	path = lib/paredit
+	url = https://mumble.net/~campbell/git/paredit.git
+[submodule "pg"]
+	path = lib/pg
+	url = https://github.com/cbbrowne/pg.el.git
+[submodule "php-mode"]
+	path = lib/php-mode
+	url = git@github.com:ejmr/php-mode.git
+[submodule "plantuml-mode"]
+	path = lib/plantuml-mode
+	url = git@github.com:skuro/plantuml-mode.git
+[submodule "popwin"]
+	path = lib/popwin
+	url = git@github.com:m2ym/popwin-el.git
+[submodule "pos-tip"]
+	path = lib/pos-tip
+	url = git@github.com:pitkali/pos-tip.git
+[submodule "projectile"]
+	path = lib/projectile
+	url = git@github.com:bbatsov/projectile.git
+[submodule "pythonic"]
+	path = lib/pythonic
+	url = git@github.com:proofit404/pythonic.git
+[submodule "rainbow-delimiters"]
+	path = lib/rainbow-delimiters
+	url = git@github.com:Fanael/rainbow-delimiters.git
+[submodule "restclient"]
+	path = lib/restclient
+	url = git@github.com:pashky/restclient.el.git
+[submodule "s"]
+	path = lib/s
+	url = git@github.com:magnars/s.el.git
+[submodule "undo-tree"]
+	path = lib/undo-tree
+	url = git@github.com:emacsorphanage/undo-tree.git
+[submodule "use-package"]
+	path = lib/use-package
+	url = git@github.com:jwiegley/use-package.git
+[submodule "which-key"]
+	path = lib/which-key
+	url = git@github.com:justbur/emacs-which-key.git
+[submodule "with-editor"]
+	path = lib/with-editor
+	url = git@github.com:magit/with-editor.git
+[submodule "yaml-mode"]
+	path = lib/yaml-mode
+	url = git@github.com:yoshiki/yaml-mode.git
+[submodule "zenburn-theme"]
+	path = lib/zenburn-theme
+	url = git@github.com:bbatsov/zenburn-emacs.git

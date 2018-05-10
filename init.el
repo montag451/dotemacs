@@ -24,18 +24,14 @@ value of the symbol."
   (expand-file-name (concat user-emacs-directory "plantuml.8057.jar"))
   "Path of the plantuml jar file")
 
-;; initialize package.el machinery
+;; disable package.el
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.org/packages/"))
-(package-initialize)
+(my/setq package-enable-at-startup nil)
 
-;; install and configure use-package
-(unless (package-installed-p 'use-package)
-  (progn
-    (package-refresh-contents)
-    (package-install 'use-package t)))
-(my/setq use-package-verbose t)
+;; configure borg
+(add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
+(require 'borg)
+(borg-initialize)
 
 ;; no startup screen please
 (my/setq inhibit-startup-screen t)
@@ -83,10 +79,6 @@ value of the symbol."
 ;; make Emacs case sensitive when searching/replacing/completing
 (my/setq case-fold-search nil)
 (my/setq case-replace nil)
-
-;; install diminish before configuring other packages
-(use-package diminish
-  :ensure t)
 
 ;;; builtin packages
 
@@ -222,13 +214,24 @@ window is deleted if it's displayed and BUFFER is killed."
 
 ;;; external packages
 
+(use-package auto-compile
+  :demand t
+  :config
+  (auto-compile-on-load-mode)
+  (auto-compile-on-save-mode)
+  (setq auto-compile-display-buffer nil)
+  (setq auto-compile-mode-line-counter t)
+  (setq auto-compile-source-recreate-deletes-dest t)
+  (setq auto-compile-toggle-deletes-nonlib-dest t)
+  (setq auto-compile-update-autoloads t)
+  (add-hook 'auto-compile-inhibit-compile-hook
+            #'auto-compile-inhibit-compile-detached-git-head))
+
 (use-package zenburn-theme
-  :ensure t
   :config
   (load-theme 'zenburn t))
 
 (use-package avy
-  :ensure t
   :config
   (my/setq avy-keys (number-sequence ?a ?z))
   (my/setq avy-case-fold-search nil))
@@ -236,7 +239,6 @@ window is deleted if it's displayed and BUFFER is killed."
 ;; evil-leader must be enabled before evil, otherwise evil-leader
 ;; won't be enabled in initial buffer (*scratch*, *Messages*, ...)
 (use-package evil-leader
-  :ensure t
   :demand
   :config
   (evil-leader/set-leader "<SPC>")
@@ -247,7 +249,6 @@ window is deleted if it's displayed and BUFFER is killed."
   (global-evil-leader-mode))
 
 (use-package evil
-  :ensure t
   :config
   (defun my/fix-evil-hiding-minor-mode-map (&rest _args)
     "See `https://github.com/syl20bnr/spacemacs/issues/9391'"
@@ -279,7 +280,6 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq undo-tree-mode-lighter ""))
 
 (use-package helm
-  :ensure t
   :diminish
   :demand
   :init
@@ -309,7 +309,6 @@ window is deleted if it's displayed and BUFFER is killed."
   (helm-mode))
 
 (use-package helm-gtags
-  :ensure t
   :defer t
   :init
   (add-hook 'prog-mode-hook
@@ -330,7 +329,6 @@ window is deleted if it's displayed and BUFFER is killed."
     (define-key map (kbd "C-c g k") #'helm-gtags-previous-history)))
 
 (use-package paredit
-  :ensure t
   :defer t
   :init
   (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
@@ -341,13 +339,11 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq paredit-lighter ""))
 
 (use-package evil-paredit
-  :ensure t
   :defer t
   :init
   (add-hook 'emacs-lisp-mode-hook #'evil-paredit-mode))
 
 (use-package company
-  :ensure t
   :defer t
   :init
   (add-hook 'after-init-hook #'global-company-mode)
@@ -356,25 +352,21 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq company-show-numbers t))
 
 (use-package company-quickhelp
-  :ensure t
   :after company
   :config
   (company-quickhelp-mode))
 
 (use-package company-restclient
-  :ensure t
   :after company
   :config
   (add-to-list 'company-backends #'company-restclient))
 
 (use-package company-anaconda
-  :ensure t
   :after company
   :config
   (add-to-list 'company-backends #'company-anaconda))
 
 (use-package projectile
-  :ensure t
   :config
   (my/setq projectile-completion-system 'helm)
   (my/setq projectile-mode-line nil)
@@ -382,20 +374,17 @@ window is deleted if it's displayed and BUFFER is killed."
   (projectile-mode))
 
 (use-package helm-projectile
-  :ensure t
   :after helm projectile
   :config
   (helm-projectile-on))
 
 (use-package magit
-  :ensure t
   :bind (("C-x g" . magit-status)
          ("C-x M-g" . magit-dispatch-popup))
   :config
   (my/setq magit-commit-show-diff nil))
 
 (use-package multi-term
-  :ensure t
   :defer t
   :config
   (my/setq multi-term-dedicated-select-after-open-p t)
@@ -403,7 +392,6 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq term-unbind-key-list '("C-x" "C-c" "C-h" "C-y" "M-x" "M-:")))
 
 (use-package hydra
-  :ensure t
   :defer t
   :config
   (my/setq hydra-is-helpful nil))
@@ -442,7 +430,6 @@ window is deleted if it's displayed and BUFFER is killed."
   ("n" nil))
 
 (use-package anaconda-mode
-  :ensure t
   :defer t
   :init
   (add-hook 'python-mode-hook #'anaconda-mode)
@@ -451,7 +438,6 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq anaconda-mode-lighter ""))
 
 (use-package haskell-mode
-  :ensure t
   :defer t
   :config
   (add-hook 'haskell-mode-hook #'subword-mode)
@@ -462,28 +448,12 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq haskell-hoogle-url "http://hoogle.haskell.org/?hoogle=%s")
   (my/setq haskell-process-type 'stack-ghci))
 
-(use-package nix-mode :ensure t :defer t)
-
 (use-package plantuml-mode
-  :ensure t
   :defer t
   :config
   (my/setq plantuml-jar-path my/plantuml-jar-path))
 
-(use-package htmlize :ensure t :defer t)
-
-(use-package markdown-mode :ensure t :defer t)
-
-(use-package restclient :ensure t :defer t)
-
-(use-package restclient-helm :ensure t :defer t)
-
-(use-package cmake-mode :ensure t :defer t)
-
-(use-package yaml-mode :ensure t :defer t)
-
 (use-package jinja2-mode
-  :ensure t
   :mode (("\\.j2\\'" . jinja2-mode)))
 
 (use-package org
@@ -499,16 +469,12 @@ window is deleted if it's displayed and BUFFER is killed."
   :config
   (my/setq org-plantuml-jar-path my/plantuml-jar-path))
 
-(use-package ox-gfm :ensure t :defer t)
-
 (use-package which-key
-  :ensure t
   :config
   (my/setq which-key-lighter "")
   (which-key-mode))
 
 (use-package popwin
-  :ensure t
   :demand
   :config
   (global-set-key (kbd "C-c w") popwin:keymap)
@@ -520,12 +486,10 @@ window is deleted if it's displayed and BUFFER is killed."
   (popwin-mode))
 
 (use-package rainbow-delimiters
-  :ensure t
   :config
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
 (use-package aggressive-indent
-  :ensure t
   :diminish
   :defer t
   :init
@@ -533,15 +497,11 @@ window is deleted if it's displayed and BUFFER is killed."
   (add-hook 'lisp-mode-hook #'aggressive-indent-mode))
 
 (use-package erlang
-  :ensure t
   :defer t
   :config
   (my/setq inferior-erlang-machine-options '("-sname" "emacs")))
 
-(use-package php-mode :ensure t :defer t)
-
 (use-package bash-completion
-  :ensure t
   :defer t
   :init
   (add-to-list 'shell-dynamic-complete-functions #'bash-completion-dynamic-complete)
