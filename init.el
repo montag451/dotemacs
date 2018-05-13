@@ -33,6 +33,9 @@ value of the symbol."
 (require 'borg)
 (borg-initialize)
 
+;; always load the latest version of file
+(my/setq load-prefer-newer t)
+
 ;; no startup screen please
 (my/setq inhibit-startup-screen t)
 
