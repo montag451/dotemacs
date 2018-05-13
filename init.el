@@ -74,9 +74,17 @@ value of the symbol."
 ;; combination is deleted, it helps keeping the layout of frames
 (my/setq window-combination-resize t)
 
-;; set and load custom-file
-(my/setq custom-file (concat user-emacs-directory "custom.el"))
-(load custom-file t)
+;; set custom-file to the equivalent of /dev/null
+(let ((devnull (cond
+                ((or (eq system-type 'gnu/linux)
+                     (eq system-type 'darwin))
+                 "/dev/null")
+                ((or (eq system-type 'ms-dos)
+                     (eq system-type 'windows-nt))
+                 "nul")
+                (t
+                 (error "Unknown system: %s" system-type)))))
+  (my/setq custom-file devnull))
 
 ;; make Emacs case sensitive when searching/replacing/completing
 (my/setq case-fold-search nil)
