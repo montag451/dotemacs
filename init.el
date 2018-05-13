@@ -57,14 +57,13 @@ value of the symbol."
 
 ;; save some screen estate
 (menu-bar-mode -1)
-(when (fboundp 'scroll-bar-mode)
-  (scroll-bar-mode -1))
-(when (fboundp 'tool-bar-mode)
-  (tool-bar-mode -1))
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
 
 ;; set font
 (when window-system
-  (let ((font (car (x-list-fonts "Ubuntu Mono-14:style=Regular:weight=normal:slant=normal"))))
+  (let* ((pattern "Ubuntu Mono-14:style=Regular:weight=normal:slant=normal")
+         (font (car (x-list-fonts pattern))))
     (when font
       (add-to-list 'default-frame-alist (cons 'font font)))))
 
