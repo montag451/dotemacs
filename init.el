@@ -168,10 +168,9 @@ window is deleted if it's displayed and BUFFER is killed."
                       (unless (process-live-p proc)
                         (let* ((buf (process-buffer proc))
                                (win (get-buffer-window buf)))
-                          (when win
-                            (ignore-errors
-                              (delete-window win)))
-                          (kill-buffer buf)))))
+                          (if win
+                              (quit-window t win)
+                            (kill-buffer buf))))))
       buffer))
   (advice-add 'make-comint-in-buffer :filter-return #'my/comint-clean-up-on-exit))
 
