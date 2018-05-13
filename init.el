@@ -542,9 +542,8 @@ window is deleted if it's displayed and BUFFER is killed."
   (add-to-list 'shell-dynamic-complete-functions #'bash-completion-dynamic-complete)
   :config
   (my/setq bash-completion-prog "/usr/bin/env")
-  (my/setq bash-completion-args '("bash" "--noediting" "-l" "-i"))
-  (my/setq bash-completion-default-completion nil)
-  (my/setq bash-completion-enable-caching t))
+  (my/setq bash-completion-remote-prog "/usr/bin/env")
+  (my/setq bash-completion-args '("bash" "--noediting" "-l" "-i")))
 
 ;;; handy functions
 
