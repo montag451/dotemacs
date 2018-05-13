@@ -79,7 +79,7 @@
 	url = git@github.com:syohex/emacs-helm-gtags.git
 [submodule "helm-lxc"]
 	path = lib/helm-lxc
-	url = git+ssh://github.com/montag451/dotemacs.git
+	url = git@github.com:montag451/helm-lxc.git
 [submodule "helm-projectile"]
 	path = lib/helm-projectile
 	url = git@github.com:bbatsov/helm-projectile.git
