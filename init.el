@@ -473,8 +473,23 @@ window is deleted if it's displayed and BUFFER is killed."
 
 (use-package org
   :defer t
+  :init
+  (global-set-key (kbd "C-c a") #'org-agenda)
+  (global-set-key (kbd "C-c c") #'org-capture)
+  (global-set-key (kbd "C-c l") #'org-store-link)
   :config
+  (my/setq org-directory (expand-file-name "~/Annex/Org"))
+  (my/setq org-agenda-files `(,org-directory))
+  (my/setq org-default-notes-file (concat org-directory "/notes.org"))
   (my/setq org-use-speed-commands t)
+  (my/setq org-src-fontify-natively t)
+  (my/setq org-special-ctrl-a/e t)
+  (my/setq org-catch-invisible-edits t)
+  (my/setq org-M-RET-may-split-line nil)
+  (my/setq org-list-demote-modify-bullet '(("+" . "*") ("-" . "+") ("*" . "-")))
+  (my/setq org-list-indent-offset 2)
+  (my/setq org-enforce-todo-checkbox-dependencies t)
+  (my/setq org-enforce-todo-dependencies t)
   (my/setq org-babel-load-languages '((plantuml . t)
                                       (emacs-lisp . t)
                                       (gnuplot . t))))
