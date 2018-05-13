@@ -232,15 +232,14 @@ window is deleted if it's displayed and BUFFER is killed."
 ;;; external packages
 
 (use-package auto-compile
-  :demand t
   :config
   (auto-compile-on-load-mode)
   (auto-compile-on-save-mode)
-  (setq auto-compile-display-buffer nil)
-  (setq auto-compile-mode-line-counter t)
-  (setq auto-compile-source-recreate-deletes-dest t)
-  (setq auto-compile-toggle-deletes-nonlib-dest t)
-  (setq auto-compile-update-autoloads t)
+  (my/setq auto-compile-display-buffer nil)
+  (my/setq auto-compile-mode-line-counter t)
+  (my/setq auto-compile-source-recreate-deletes-dest t)
+  (my/setq auto-compile-toggle-deletes-nonlib-dest t)
+  (my/setq auto-compile-update-autoloads t)
   (add-hook 'auto-compile-inhibit-compile-hook
             #'auto-compile-inhibit-compile-detached-git-head))
 
@@ -256,7 +255,6 @@ window is deleted if it's displayed and BUFFER is killed."
 ;; evil-leader must be enabled before evil, otherwise evil-leader
 ;; won't be enabled in initial buffer (*scratch*, *Messages*, ...)
 (use-package evil-leader
-  :demand
   :config
   (evil-leader/set-leader "<SPC>")
   (evil-leader/set-key
@@ -513,7 +511,6 @@ window is deleted if it's displayed and BUFFER is killed."
   (which-key-mode))
 
 (use-package popwin
-  :demand
   :config
   (global-set-key (kbd "C-c w") popwin:keymap)
   (my/setq popwin:reuse-window nil)
