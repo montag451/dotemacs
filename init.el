@@ -278,6 +278,9 @@ window is deleted if it's displayed and BUFFER is killed."
   (evil-set-initial-state 'haskell-interactive-mode 'emacs)
   (evil-set-initial-state 'haskell-error-mode 'emacs)
   (evil-set-initial-state 'image-mode 'emacs)
+  (evil-set-initial-state 'comint-mode 'emacs)
+  (evil-set-initial-state 'magit-submodule-list-mode 'emacs)
+  (evil-set-initial-state 'process-menu-mode 'emacs)
   (evil-mode))
 
 (use-package undo-tree
