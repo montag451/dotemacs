@@ -391,7 +391,10 @@ window is deleted if it's displayed and BUFFER is killed."
   :bind (("C-x g" . magit-status)
          ("C-x M-g" . magit-dispatch-popup))
   :config
-  (my/setq magit-commit-show-diff nil))
+  (my/setq magit-commit-show-diff nil)
+  (magit-add-section-hook 'magit-status-sections-hook
+                          'magit-insert-modules-unpulled-from-upstream
+                          'magit-insert-unpulled-from-upstream))
 
 (use-package multi-term
   :defer t
