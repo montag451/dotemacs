@@ -118,6 +118,10 @@ value of the symbol."
 (use-package ediff-init
   :defer t
   :config
+  (add-hook 'ediff-prepare-buffer-hook
+            (lambda ()
+              (when (derived-mode-p 'outline-mode)
+                (outline-show-all))))
   (add-hook 'ediff-quit-hook #'winner-undo t))
 
 (use-package hippie-exp
