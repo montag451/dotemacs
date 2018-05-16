@@ -18,10 +18,10 @@
 	url = git@github.com:szermatt/emacs-bash-completion.git
 [submodule "borg"]
 	path = lib/borg
-	url = https://github.com/emacscollective/borg.git
+	url = git@github.com:emacscollective/borg.git
 [submodule "closql"]
 	path = lib/closql
-	url = https://github.com/emacscollective/closql.git
+	url = git@github.com:emacscollective/closql.git
 [submodule "cmake-mode"]
 	path = lib/cmake-mode
 	url = git@github.com:emacsmirror/cmake-mode.git
@@ -45,10 +45,10 @@
 	url = git@github.com:myrjola/diminish.el.git
 [submodule "emacsql"]
 	path = lib/emacsql
-	url = https://github.com/skeeto/emacsql.git
+	url = git@github.com:skeeto/emacsql.git
 [submodule "epkg"]
 	path = lib/epkg
-	url = https://github.com/emacscollective/epkg.git
+	url = git@github.com:emacscollective/epkg.git
 [submodule "erlang"]
 	path = lib/erlang
 	url = git@github.com:erlang/otp.git
@@ -128,7 +128,7 @@
 	url = https://mumble.net/~campbell/git/paredit.git
 [submodule "pg"]
 	path = lib/pg
-	url = https://github.com/cbbrowne/pg.el.git
+	url = git@github.com:cbbrowne/pg.el.git
 [submodule "php-mode"]
 	path = lib/php-mode
 	url = git@github.com:ejmr/php-mode.git
