@@ -346,7 +346,7 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq helm-mode-handle-completion-in-region nil)
   (my/setq helm-move-to-line-cycle-in-source t)
   (my/setq helm-net-prefer-curl t)
-  (my/setq helm-split-window-in-side-p t)
+  (my/setq helm-split-window-inside-p t)
   (helm-mode))
 
 (use-package helm-gtags
