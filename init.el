@@ -229,6 +229,20 @@ window is deleted if it's displayed and BUFFER is killed."
 
 (use-package eldoc :diminish)
 
+(use-package edebug
+  :defer t
+  :config
+  (defvar my/state-before-edebug nil)
+  (add-hook 'edebug-mode-hook
+            (lambda ()
+              (when evil-local-mode
+                (if edebug-mode
+                    (progn
+                      (setq-local my/state-before-edebug evil-state)
+                      (when (not (evil-emacs-state-p))
+                        (evil-emacs-state)))
+                  (evil-change-state my/state-before-edebug))))))
+
 ;;; external packages
 
 (use-package auto-compile
