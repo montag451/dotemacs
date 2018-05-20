@@ -389,6 +389,9 @@ window is deleted if it's displayed and BUFFER is killed."
   :init
   (add-hook 'after-init-hook #'global-company-mode)
   :config
+  (my/setq company-frontends '(company-pseudo-tooltip-frontend
+                               company-preview-if-just-one-frontend
+                               company-echo-metadata-frontend))
   (my/setq company-lighter "")
   (my/setq company-show-numbers t))
 
