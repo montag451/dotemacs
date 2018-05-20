@@ -592,6 +592,16 @@ MODE is a symbol."
     (my/list-buffers-with-mode 'shell-mode)
     :name "Shell buffers")))
 
+(defun my/get-bash-path ()
+  (let ((shell-file-name "/bin/sh"))
+    (with-temp-buffer
+      (unless (zerop (shell-command "bash -c \"type -p bash\"" t))
+        (error "Cannot find bash on %s"
+               (or (file-remote-p default-directory 'host)
+                   (system-name))))
+      (goto-char (point-min))
+      (buffer-substring-no-properties (point) (line-end-position)))))
+
 (defun my/spawn-shell (dir &optional force)
   "Spawn a shell using DIR as the default directory.
 If FORCE is non-nil a new shell will be spawned even if one for
@@ -600,13 +610,14 @@ interactively with a prefix arg, FORCE is set to a non-nil
 value."
   (interactive "DDefault directory: \nP")
   (require 'shell)
-  (defvar explicit-env-args nil)
   (let* ((default-directory dir)
+         (remote (file-remote-p dir))
          (user (or (file-remote-p dir 'user) (user-login-name)))
-         (host (or (file-remote-p dir 'host) system-name))
+         (host (or (file-remote-p dir 'host) (system-name)))
          (buffer (format "*shell %s@%s*" user host))
-         (shell-file-name "/usr/bin/env")
-         (explicit-env-args (cons "bash" explicit-bash-args)))
+         (shell-file-name (or (and remote
+                                   (my/get-bash-path))
+                              shell-file-name)))
     (shell (if force
                (generate-new-buffer-name buffer)
              buffer))))
