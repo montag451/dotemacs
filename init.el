@@ -184,6 +184,7 @@ value of the symbol."
 (use-package comint
   :defer t
   :config
+  (define-key comint-mode-map (kbd "M-r") #'helm-comint-input-ring)
   (defun my/comint-clean-up-on-exit (buffer)
     "Kill BUFFER and its window if it's displayed.
 When the inferior process of BUFFER is not live anymore, its
