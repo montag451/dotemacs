@@ -617,10 +617,18 @@ value."
          (buffer (format "*shell %s@%s*" user host))
          (shell-file-name (or (and remote
                                    (my/get-bash-path))
-                              shell-file-name)))
-    (shell (if force
-               (generate-new-buffer-name buffer)
-             buffer))))
+                              shell-file-name))
+         (histfile-env-name "HISTFILE")
+         (prev-histfile (getenv histfile-env-name)))
+    (unwind-protect
+        (let ((histfile (expand-file-name (concat remote "~/.bash_history")))
+              (tramp-histfile-override nil))
+          (when remote
+            (setenv histfile-env-name histfile))
+          (shell (if force
+                     (generate-new-buffer-name buffer)
+                   buffer)))
+      (setenv histfile-env-name prev-histfile))))
 
 (defun my/spawn-shell-same-window (dir &optional force)
   (interactive "DDefault directory: \nP")
