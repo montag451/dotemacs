@@ -441,7 +441,7 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq hydra-is-helpful nil))
 
 ;; hydra for window manipulation
-(defhydra hydra-window (global-map "C-x w" :color amaranth)
+(defhydra hydra-window (global-map "C-x w" :color red)
   "Window manipulation"
   ("h" windmove-left "left")
   ("j" windmove-down "down")
@@ -466,7 +466,7 @@ window is deleted if it's displayed and BUFFER is killed."
   ("n" nil))
 
 ;; hydra for multi-term
-(defhydra hydra-multi-term (global-map "C-x t" :color amaranth)
+(defhydra hydra-multi-term (global-map "C-x t" :color red)
   "Multiple terminal"
   ("t" multi-term "create")
   ("j" multi-term-next "next")
