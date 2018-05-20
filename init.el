@@ -33,6 +33,14 @@ value of the symbol."
 (require 'borg)
 (borg-initialize)
 
+;; when the init file is byte-compiled, use-package is autoloaded and
+;; all invocations of `use-package' are expanded and no reference to
+;; functions or variables defined by use-package exists anymore in the
+;; expansion, expect for the variable `personal-keybindings' which is
+;; used to register all bindings made with use-package. So to prevent
+;; the use of an undefined variable we need to load use-package
+(require 'use-package)
+
 ;; always load the latest version of file
 (my/setq load-prefer-newer t)
 
