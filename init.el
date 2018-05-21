@@ -572,6 +572,10 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq bash-completion-remote-prog "/usr/bin/env")
   (my/setq bash-completion-args '("bash" "--noediting" "-l" "-i")))
 
+(use-package pdf-tools
+  :config
+  (pdf-tools-install))
+
 ;;; handy functions
 
 (defun my/list-buffers-with-mode (mode)
