@@ -126,6 +126,9 @@
 [submodule "paredit"]
 	path = lib/paredit
 	url = https://mumble.net/~campbell/git/paredit.git
+[submodule "pdf-tools"]
+	path = lib/pdf-tools
+	url = git@github.com:politza/pdf-tools.git
 [submodule "pg"]
 	path = lib/pg
 	url = git@github.com:cbbrowne/pg.el.git
@@ -156,6 +159,9 @@
 [submodule "s"]
 	path = lib/s
 	url = git@github.com:magnars/s.el.git
+[submodule "tablist"]
+	path = lib/tablist
+	url = git@github.com:politza/tablist.git
 [submodule "undo-tree"]
 	path = lib/undo-tree
 	url = git@github.com:emacsorphanage/undo-tree.git
