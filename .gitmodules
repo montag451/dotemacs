@@ -62,6 +62,9 @@
 [submodule "evil-paredit"]
 	path = lib/evil-paredit
 	url = git@github.com:roman/evil-paredit.git
+[submodule "eyebrowse"]
+	path = lib/eyebrowse
+	url = git@github.com:wasamasa/eyebrowse.git
 [submodule "f"]
 	path = lib/f
 	url = git@github.com:rejeep/f.el.git
