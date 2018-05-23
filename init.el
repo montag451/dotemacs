@@ -537,15 +537,16 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq which-key-lighter "")
   (which-key-mode))
 
-(use-package popwin
+(use-package shackle
   :config
-  (global-set-key (kbd "C-c w") popwin:keymap)
-  (my/setq popwin:reuse-window nil)
-  (add-to-list 'popwin:special-display-config
-               '("^\\*Man .*\\*$" :regexp t :width 80 :position right))
-  (add-hook 'helm-after-initialize-hook (lambda () (popwin-mode -1)))
-  (add-hook 'helm-cleanup-hook (lambda () (popwin-mode 1)))
-  (popwin-mode))
+  (my/setq shackle-default-rule '(:select t))
+  (my/setq shackle-rules
+           '(("^\\*Man .*\\*$" :select t :regexp t :size 80 :align right)
+             (inferior-emacs-lisp-mode :popup t :select t :align below)
+             (help-mode :select t :size 0.4 :align below)
+             ("*Completions*" :noselect t)
+             ("\\*shell.*\\*" :regexp t :same t)))
+  (shackle-mode))
 
 (use-package rainbow-delimiters
   :config
