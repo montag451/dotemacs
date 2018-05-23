@@ -162,6 +162,9 @@
 [submodule "s"]
 	path = lib/s
 	url = git@github.com:magnars/s.el.git
+[submodule "shackle"]
+	path = lib/shackle
+	url = git@github.com:wasamasa/shackle.git
 [submodule "tablist"]
 	path = lib/tablist
 	url = git@github.com:politza/tablist.git
