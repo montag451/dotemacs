@@ -141,9 +141,6 @@
 [submodule "plantuml-mode"]
 	path = lib/plantuml-mode
 	url = git@github.com:skuro/plantuml-mode.git
-[submodule "popwin"]
-	path = lib/popwin
-	url = git@github.com:m2ym/popwin-el.git
 [submodule "pos-tip"]
 	path = lib/pos-tip
 	url = git@github.com:pitkali/pos-tip.git
