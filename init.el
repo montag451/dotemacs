@@ -548,6 +548,8 @@ window is deleted if it's displayed and BUFFER is killed."
              (help-mode :select t :size 0.4 :align below)
              ("*Completions*" :noselect t)
              ("\\*shell.*\\*" :regexp t :same t)))
+  (add-hook 'helm-after-initialize-hook (lambda () (shackle-mode -1)))
+  (add-hook 'helm-cleanup-hook #'shackle-mode)
   (shackle-mode))
 
 (use-package rainbow-delimiters
