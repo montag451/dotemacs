@@ -56,6 +56,7 @@
 [submodule "evil"]
 	path = lib/evil
 	url = git@github.com:emacs-evil/evil.git
+        info-path = doc
 [submodule "evil-leader"]
 	path = lib/evil-leader
 	url = git@github.com:cofi/evil-leader.git
@@ -74,6 +75,7 @@
 [submodule "haskell-mode"]
 	path = lib/haskell-mode
 	url = git@github.com:haskell/haskell-mode.git
+        info-path = doc
 [submodule "helm"]
 	path = lib/helm
 	url = git@github.com:emacs-helm/helm.git
@@ -105,6 +107,7 @@
 [submodule "magit"]
 	path = lib/magit
 	url = git@github.com:magit/magit.git
+        info-path = Documentation
 [submodule "magit-popup"]
 	path = lib/magit-popup
 	url = git@github.com:magit/magit-popup.git
