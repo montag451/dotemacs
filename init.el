@@ -585,6 +585,11 @@ window is deleted if it's displayed and BUFFER is killed."
   :config
   (pdf-tools-install))
 
+(use-package virtualenvwrapper
+  :defer t
+  :config
+  (my/setq venv-location (expand-file-name "~/Prog/venv")))
+
 ;;; handy functions
 
 (defun my/list-buffers-with-mode (mode)
