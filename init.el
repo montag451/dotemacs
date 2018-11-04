@@ -414,9 +414,9 @@ window is deleted if it's displayed and BUFFER is killed."
   (add-to-list 'company-backends #'company-anaconda))
 
 (use-package projectile
+  :diminish
   :config
   (my/setq projectile-completion-system 'helm)
-  (my/setq projectile-mode-line nil)
   (my/setq projectile-use-git-grep t)
   (projectile-mode))
 
