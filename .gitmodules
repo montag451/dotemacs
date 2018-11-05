@@ -97,6 +97,9 @@
 [submodule "hydra"]
 	path = lib/hydra
 	url = git@github.com:abo-abo/hydra.git
+[submodule "inf-mongo"]
+	path = lib/inf-mongo
+	url = git@github.com:endofunky/inf-mongo.git
 [submodule "jinja2-mode"]
 	path = lib/jinja2-mode
 	url = git@github.com:paradoxxxzero/jinja2-mode.git
