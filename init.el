@@ -415,10 +415,12 @@ window is deleted if it's displayed and BUFFER is killed."
   (add-to-list 'company-backends #'company-anaconda))
 
 (use-package projectile
-  :diminish
+  :init
+  (my/setq projectile-mode-line-prefix "")
   :config
   (my/setq projectile-completion-system 'helm)
   (my/setq projectile-use-git-grep t)
+  (my/setq projectile-dynamic-mode-line nil)
   (projectile-mode))
 
 (use-package helm-projectile
