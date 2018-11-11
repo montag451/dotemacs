@@ -548,6 +548,7 @@ window is deleted if it's displayed and BUFFER is killed."
              (inferior-emacs-lisp-mode :popup t :select t :align below)
              (help-mode :select t :size 0.4 :align below)
              ("*Completions*" :noselect t)
+             ("*HTTP Response*" :noselect t)
              ("\\*shell.*\\*" :regexp t :same t)))
   (add-hook 'helm-after-initialize-hook (lambda () (shackle-mode -1)))
   (add-hook 'helm-cleanup-hook #'shackle-mode)
