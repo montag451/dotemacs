@@ -87,6 +87,7 @@ value of the symbol."
 ;; set custom-file to the equivalent of /dev/null
 (let ((devnull (cond
                 ((or (eq system-type 'gnu/linux)
+                     (eq system-type 'cygwin)
                      (eq system-type 'darwin))
                  "/dev/null")
                 ((or (eq system-type 'ms-dos)
