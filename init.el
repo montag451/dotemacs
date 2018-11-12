@@ -610,11 +610,14 @@ MODE is a symbol."
 
 (defun my/helm-switch-to-shell-buffer ()
   (interactive)
-  (switch-to-buffer
-   (helm-comp-read
-    "Switch to shell buffer: "
-    (my/list-buffers-with-mode 'shell-mode)
-    :name "Shell buffers")))
+  (let ((buffers (my/list-buffers-with-mode 'shell-mode)))
+    (if buffers
+        (switch-to-buffer
+         (helm-comp-read
+          "Switch to shell buffer: "
+          buffers
+          :name "Shell buffers"))
+      (message "No shell buffer found!"))))
 
 (defun my/get-bash-path ()
   (let ((shell-file-name "/bin/sh"))
