@@ -659,6 +659,12 @@ value."
   (let ((display-buffer-overriding-action '(display-buffer-same-window)))
     (my/spawn-shell dir force)))
 
+(defun my/kill-shell-buffers ()
+  (interactive)
+  (dolist (buffer (my/list-buffers-with-mode 'shell-mode))
+    (with-current-buffer buffer
+      (comint-send-eof))))
+
 (global-set-key (kbd "C-c s s") #'my/helm-switch-to-shell-buffer)
 (global-set-key (kbd "C-c s p") #'my/spawn-shell)
 (global-set-key (kbd "C-c s x") #'my/spawn-shell-same-window)
