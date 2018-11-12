@@ -583,6 +583,7 @@ window is deleted if it's displayed and BUFFER is killed."
 
 (use-package eyebrowse
   :config
+  (my/setq eyebrowse-new-workspace t)
   (eyebrowse-mode))
 
 (use-package pdf-tools
