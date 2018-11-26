@@ -545,6 +545,7 @@ window is deleted if it's displayed and BUFFER is killed."
 (use-package shackle
   :config
   (my/setq shackle-default-rule '(:select t))
+  (my/setq shackle-inhibit-window-quit-on-same-windows t)
   (my/setq shackle-rules
            '(("^\\*Man .*\\*$" :select t :regexp t :size 80 :align right)
              (inferior-emacs-lisp-mode :popup t :select t :align below)
