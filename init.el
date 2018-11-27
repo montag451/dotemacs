@@ -240,7 +240,10 @@ window is deleted if it's displayed and BUFFER is killed."
   :config
   (my/setq ange-ftp-try-passive-mode t))
 
-(use-package eldoc :diminish)
+(use-package eldoc
+  :defer t
+  :config
+  (my/setq eldoc-minor-mode-string nil))
 
 (use-package edebug
   :defer t
@@ -325,7 +328,6 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq undo-tree-mode-lighter ""))
 
 (use-package helm
-  :diminish
   :demand
   :init
   (require 'helm-config)
@@ -341,6 +343,7 @@ window is deleted if it's displayed and BUFFER is killed."
          :map isearch-mode-map
          ("M-i" . helm-occur-from-isearch))
   :config
+  (my/setq helm-completion-mode-string nil)
   (my/setq helm-command-prefix-key "C-c h")
   (my/setq helm-buffers-fuzzy-matching t)
   (my/setq helm-recentf-fuzzy-match t)
