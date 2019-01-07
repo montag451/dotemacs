@@ -444,7 +444,9 @@ window is deleted if it's displayed and BUFFER is killed."
   :defer t
   :config
   (my/setq multi-term-dedicated-select-after-open-p t)
-  (my/setq term-bind-key-alist '(("C-c C-c" . term-interrupt-subjob)))
+  (my/setq term-bind-key-alist '(("C-c C-c" . term-interrupt-subjob)
+                                 ("C-c C-j" . term-line-mode)
+                                 ("C-c C-k" . term-char-mode)))
   (my/setq term-unbind-key-list '("C-x" "C-c" "C-h" "C-y" "M-x" "M-:")))
 
 (use-package hydra
