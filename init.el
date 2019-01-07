@@ -320,6 +320,8 @@ window is deleted if it's displayed and BUFFER is killed."
   (evil-set-initial-state 'comint-mode 'emacs)
   (evil-set-initial-state 'magit-submodule-list-mode 'emacs)
   (evil-set-initial-state 'process-menu-mode 'emacs)
+  (evil-set-initial-state 'epkg-list-mode 'emacs)
+  (evil-set-initial-state 'epa-key-list-mode 'emacs)
   (evil-mode))
 
 (use-package undo-tree
