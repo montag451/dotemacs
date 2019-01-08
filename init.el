@@ -113,7 +113,9 @@ The function returned can be used as an action function for
                #'display-buffer-pop-up-window)))
            ("^\\*HTTP Response\\*$"
             (display-buffer-reuse-window
-             display-buffer-pop-up-window))))
+             display-buffer-pop-up-window))
+           ("^\\*shell.*\\*$"
+            (display-buffer-same-window))))
 
 ;; define a default `display-buffer' action that execute
 ;; `display-buffer-fallback-action' and select the window displaying
