@@ -3,7 +3,7 @@
 ;; helper functions and macros
 (defmacro my/setq (&rest args)
   "A macro that behaves like `setq' except when a symbol has been defined
-using `defcustom'. In this case, it uses `customize-set-variable' to set the
+using `defcustom'.  In this case, it uses `customize-set-variable' to set the
 value of the symbol."
   (let (def)
     (while args
@@ -83,6 +83,48 @@ value of the symbol."
 ;; resize all the windows of a combination when one window of the
 ;; combination is deleted, it helps keeping the layout of frames
 (my/setq window-combination-resize t)
+
+(defun my/display-buffer-and-select (&rest functions)
+  "Return a function which call every functions in FUNCTIONS in turn until one succeed and then select the window.
+The function returned can be used as an action function for
+`display-buffer'.  The function returned always prepend
+`display-buffer-reuse-window' to FUNCTIONS."
+  (lambda (buffer alist)
+    (let ((functions functions)
+          win)
+      (setq functions (cons #'display-buffer-reuse-window functions))
+      (while (and functions (not win))
+        (setq win (funcall (car functions) buffer alist)
+              functions (cdr functions)))
+      (when win
+        (select-window win)))))
+
+(my/setq display-buffer-alist
+         `(("^\\*Help\\*$"
+            ,(my/display-buffer-and-select
+              #'display-buffer-in-side-window)
+            (side . bottom) (window-height . 0.4))
+           ("^\\*Man .*\\*$"
+            ,(my/display-buffer-and-select
+              #'display-buffer-in-side-window)
+            (side . right) (window-width . 80))
+           ("^\\*ielm\\*$"
+            (,(my/display-buffer-and-select
+               #'display-buffer-pop-up-window)))
+           ("^\\*HTTP Response\\*$"
+            (display-buffer-reuse-window
+             display-buffer-pop-up-window))))
+
+;; define a default `display-buffer' action that execute
+;; `display-buffer-fallback-action' and select the window displaying
+;; the buffer if any. This action is used when no match in
+;; `display-buffer-alist' has been found
+(my/setq display-buffer-base-action
+         (let ((functions (car display-buffer-fallback-action))
+               (alist (cdr display-buffer-fallback-action)))
+           (list (apply #'my/display-buffer-and-select
+                        (if (listp functions) functions (list functions)))
+                 alist)))
 
 ;; set custom-file to the equivalent of /dev/null
 (let ((devnull (cond
@@ -549,20 +591,20 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq which-key-lighter "")
   (which-key-mode))
 
-(use-package shackle
-  :config
-  (my/setq shackle-default-rule '(:select t))
-  (my/setq shackle-inhibit-window-quit-on-same-windows t)
-  (my/setq shackle-rules
-           '(("^\\*Man .*\\*$" :select t :regexp t :size 80 :align right)
-             (inferior-emacs-lisp-mode :popup t :select t :align below)
-             (help-mode :select t :size 0.4 :align below)
-             ("*Completions*" :noselect t)
-             ("*HTTP Response*" :noselect t)
-             ("\\*shell.*\\*" :regexp t :same t)))
-  (add-hook 'helm-after-initialize-hook (lambda () (shackle-mode -1)))
-  (add-hook 'helm-cleanup-hook #'shackle-mode)
-  (shackle-mode))
+;; (use-package shackle
+;;   :config
+;;   (my/setq shackle-default-rule '(:select t))
+;;   (my/setq shackle-inhibit-window-quit-on-same-windows t)
+;;   (my/setq shackle-rules
+;;            '(("^\\*Man .*\\*$" :select t :regexp t :size 80 :align right)
+;;              (inferior-emacs-lisp-mode :popup t :select t :align below)
+;;              (help-mode :select t :size 0.4 :align below)
+;;              ("*Completions*" :noselect t)
+;;              ("*HTTP Response*" :noselect t)
+;;              ("\\*shell.*\\*" :regexp t :same t)))
+;;   (add-hook 'helm-after-initialize-hook (lambda () (shackle-mode -1)))
+;;   (add-hook 'helm-cleanup-hook #'shackle-mode)
+;;   (shackle-mode))
 
 (use-package rainbow-delimiters
   :config
@@ -640,7 +682,7 @@ MODE is a symbol."
 (defun my/spawn-shell (dir &optional force)
   "Spawn a shell using DIR as the default directory.
 If FORCE is non-nil a new shell will be spawned even if one for
-the same user and the same host already exists. When called
+the same user and the same host already exists.  When called
 interactively with a prefix arg, FORCE is set to a non-nil
 value."
   (interactive "DDefault directory: \nP")
