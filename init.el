@@ -104,6 +104,40 @@ The function returned can be used as an action function for
     (with-current-buffer buffer
       (derived-mode-p mode))))
 
+(defmacro my/display-buffer-rules (rules)
+  (let (computed-rules)
+    (dolist (rule rules)
+      (let* ((condition (car rule))
+             (action-functions (plist-get (cdr rule) :action-fns))
+             (action-alist (plist-get (cdr rule) :action-alist))
+             (noselect (plist-get (cdr rule) :noselect))
+             (default-action-functions '(display-buffer-reuse-window
+                                         display-buffer-pop-up-window))
+             (computed-condition
+              (pcase condition
+                ((pred stringp) condition)
+                ((pred symbolp) (my/check-mode condition))
+                (bad (error "Bad condition: %S" bad))))
+             (computed-action-functions
+              (cond
+               (noselect
+                (if (not action-functions)
+                    default-action-functions
+                  action-functions))
+               (action-functions
+                (my/display-buffer-and-select default-action-functions))
+               (t
+                (my/display-buffer-and-select action-functions)))))
+        (push (list computed-condition
+                    (cons computed-action-functions action-alist))
+              computed-rules)))
+    `(nreverse ,computed-rules)))
+
+(my/display-buffer-rules
+ ((help-mode
+   :action-fns display-buffer-in-side-window
+   :action-alist ((side . bottom) (window-height . 0.4)))))
+
 (my/setq display-buffer-alist
          `((,(my/check-mode 'help-mode)
             ,(my/display-buffer-and-select
