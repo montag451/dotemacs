@@ -99,8 +99,13 @@ The function returned can be used as an action function for
       (when win
         (select-window win)))))
 
+(defun my/check-mode (mode)
+  (lambda (buffer action)
+    (with-current-buffer buffer
+      (derived-mode-p mode))))
+
 (my/setq display-buffer-alist
-         `(("^\\*Help\\*$"
+         `((,(my/check-mode 'help-mode)
             ,(my/display-buffer-and-select
               #'display-buffer-in-side-window)
             (side . bottom) (window-height . 0.4))
@@ -108,7 +113,7 @@ The function returned can be used as an action function for
             ,(my/display-buffer-and-select
               #'display-buffer-in-side-window)
             (side . right) (window-width . 80))
-           ("^\\*ielm\\*$"
+           (,(my/check-mode 'inferior-emacs-lisp-mode)
             (,(my/display-buffer-and-select
                #'display-buffer-pop-up-window)))
            ("^\\*HTTP Response\\*$"
