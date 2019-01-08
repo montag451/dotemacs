@@ -84,33 +84,38 @@ value of the symbol."
 ;; combination is deleted, it helps keeping the layout of frames
 (my/setq window-combination-resize t)
 
-(defun my/display-buffer-and-select (&rest functions)
+(defun my/display-buffer-and-select (functions)
   "Return a function which call every functions in FUNCTIONS in turn until one succeed and then select the window.
 The function returned can be used as an action function for
 `display-buffer'.  The function returned always prepend
 `display-buffer-reuse-window' to FUNCTIONS."
   (lambda (buffer alist)
-    (let ((functions functions)
+    (let ((functions (if (listp functions) functions (list functions)))
           win)
-      (setq functions (cons #'display-buffer-reuse-window functions))
+      (when (derived-mode-p 'help-mode)
+        (when-let ((win (get-buffer-window)))
+          (quit-window nil win)
+          (my/setq functions (list #'display-buffer-same-window))))
+      (my/setq functions (cons #'display-buffer-reuse-window functions))
       (while (and functions (not win))
-        (setq win (funcall (car functions) buffer alist)
-              functions (cdr functions)))
+        (my/setq win (funcall (car functions) buffer alist)
+                 functions (cdr functions)))
       (when win
         (select-window win)))))
 
 (defun my/check-mode (mode)
-  (lambda (buffer action)
+  (lambda (buffer _action)
     (with-current-buffer buffer
       (derived-mode-p mode))))
 
-(defmacro my/display-buffer-rules (rules)
+(defun my/setup-display-buffer-alist(rules)
   (let (computed-rules)
     (dolist (rule rules)
       (let* ((condition (car rule))
-             (action-functions (plist-get (cdr rule) :action-fns))
-             (action-alist (plist-get (cdr rule) :action-alist))
-             (noselect (plist-get (cdr rule) :noselect))
+             (plist (cdr rule))
+             (action-functions (plist-get plist :action-fns))
+             (action-alist (plist-get plist :action-alist))
+             (noselect (plist-get plist :noselect))
              (default-action-functions '(display-buffer-reuse-window
                                          display-buffer-pop-up-window))
              (computed-condition
@@ -125,47 +130,31 @@ The function returned can be used as an action function for
                     default-action-functions
                   action-functions))
                (action-functions
-                (my/display-buffer-and-select default-action-functions))
+                (my/display-buffer-and-select action-functions))
                (t
-                (my/display-buffer-and-select action-functions)))))
-        (push (list computed-condition
+                (my/display-buffer-and-select default-action-functions)))))
+        (push (cons computed-condition
                     (cons computed-action-functions action-alist))
               computed-rules)))
-    `(nreverse ,computed-rules)))
+    (my/setq display-buffer-alist (nreverse computed-rules))
+    ;; add the default rule (fallback action + select)
+    (my/setq display-buffer-base-action
+             (cons (my/display-buffer-and-select
+                    (car display-buffer-fallback-action))
+                   (cdr display-buffer-fallback-action)))))
 
-(my/display-buffer-rules
- ((help-mode
-   :action-fns display-buffer-in-side-window
-   :action-alist ((side . bottom) (window-height . 0.4)))))
-
-(my/setq display-buffer-alist
-         `((,(my/check-mode 'help-mode)
-            ,(my/display-buffer-and-select
-              #'display-buffer-in-side-window)
-            (side . bottom) (window-height . 0.4))
-           ("^\\*Man .*\\*$"
-            ,(my/display-buffer-and-select
-              #'display-buffer-in-side-window)
-            (side . right) (window-width . 80))
-           (,(my/check-mode 'inferior-emacs-lisp-mode)
-            (,(my/display-buffer-and-select
-               #'display-buffer-pop-up-window)))
-           ("^\\*HTTP Response\\*$"
-            (display-buffer-reuse-window
-             display-buffer-pop-up-window))
-           ("^\\*shell.*\\*$"
-            (display-buffer-same-window))))
-
-;; define a default `display-buffer' action that execute
-;; `display-buffer-fallback-action' and select the window displaying
-;; the buffer if any. This action is used when no match in
-;; `display-buffer-alist' has been found
-(my/setq display-buffer-base-action
-         (let ((functions (car display-buffer-fallback-action))
-               (alist (cdr display-buffer-fallback-action)))
-           (list (apply #'my/display-buffer-and-select
-                        (if (listp functions) functions (list functions)))
-                 alist)))
+(my/setup-display-buffer-alist
+ '((help-mode
+    :action-fns display-buffer-in-side-window
+    :action-alist ((side . bottom) (window-height . 0.4)))
+   (inferior-emacs-lisp-mode
+    :action-fns display-buffer-pop-up-window)
+   ("^\\*Man .*\\*$"
+    :action-fns display-buffer-in-side-window
+    :action-alist ((side . right) (window-width . 80)))
+   ("^\\*HTTP Response\\*$" :noselect t)
+   ("^\\*shell.*\\*$"
+    :action-fns display-buffer-same-window)))
 
 ;; set custom-file to the equivalent of /dev/null
 (let ((devnull (cond
