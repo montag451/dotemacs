@@ -88,10 +88,6 @@ value of the symbol."
 (defvar my/display-buffer-base-action nil)
 
 (defun my/display-buffer-and-select (functions)
-  "Return a function which call every functions in FUNCTIONS in turn until one succeed and then select the window.
-The function returned can be used as an action function for
-`display-buffer'.  The function returned always prepend
-`display-buffer-reuse-window' to FUNCTIONS."
   (lambda (buffer alist)
     (let ((functions (if (listp functions) functions (list functions)))
           win)
@@ -142,17 +138,18 @@ The function returned can be used as an action function for
                     (cons computed-action-functions action-alist))
               computed-rules)))
     (my/setq my/display-buffer-alist (nreverse computed-rules))
-    ;; add the default rule (fallback action + select)
     (my/setq my/display-buffer-base-action
              (cons (my/display-buffer-and-select
                     (car display-buffer-fallback-action))
                    (cdr display-buffer-fallback-action)))))
 
 (defun my/enable-display-buffer-alist ()
+  (interactive)
   (my/setq display-buffer-alist my/display-buffer-alist
            display-buffer-base-action my/display-buffer-base-action))
 
 (defun my/disable-display-buffer-alist ()
+  (interactive)
   (my/setq display-buffer-alist nil
            display-buffer-base-action nil))
 
