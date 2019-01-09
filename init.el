@@ -84,6 +84,9 @@ value of the symbol."
 ;; combination is deleted, it helps keeping the layout of frames
 (my/setq window-combination-resize t)
 
+(defvar my/display-buffer-alist nil)
+(defvar my/display-buffer-base-action nil)
+
 (defun my/display-buffer-and-select (functions)
   "Return a function which call every functions in FUNCTIONS in turn until one succeed and then select the window.
 The function returned can be used as an action function for
@@ -92,7 +95,9 @@ The function returned can be used as an action function for
   (lambda (buffer alist)
     (let ((functions (if (listp functions) functions (list functions)))
           win)
-      (when (derived-mode-p 'help-mode)
+      (when (and (derived-mode-p 'help-mode)
+                 (not (with-current-buffer buffer
+                        (derived-mode-p 'help-mode))))
         (when-let ((win (get-buffer-window)))
           (quit-window nil win)
           (my/setq functions (list #'display-buffer-same-window))))
@@ -136,12 +141,20 @@ The function returned can be used as an action function for
         (push (cons computed-condition
                     (cons computed-action-functions action-alist))
               computed-rules)))
-    (my/setq display-buffer-alist (nreverse computed-rules))
+    (my/setq my/display-buffer-alist (nreverse computed-rules))
     ;; add the default rule (fallback action + select)
-    (my/setq display-buffer-base-action
+    (my/setq my/display-buffer-base-action
              (cons (my/display-buffer-and-select
                     (car display-buffer-fallback-action))
                    (cdr display-buffer-fallback-action)))))
+
+(defun my/enable-display-buffer-alist ()
+  (my/setq display-buffer-alist my/display-buffer-alist
+           display-buffer-base-action my/display-buffer-base-action))
+
+(defun my/disable-display-buffer-alist ()
+  (my/setq display-buffer-alist nil
+           display-buffer-base-action nil))
 
 (my/setup-display-buffer-alist
  '((help-mode
@@ -151,10 +164,12 @@ The function returned can be used as an action function for
     :action-fns display-buffer-pop-up-window)
    ("^\\*Man .*\\*$"
     :action-fns display-buffer-in-side-window
-    :action-alist ((side . right) (window-width . 80)))
+    :action-alist ((side . right) (window-width . fit-window-to-buffer)))
    ("^\\*HTTP Response\\*$" :noselect t)
    ("^\\*shell.*\\*$"
     :action-fns display-buffer-same-window)))
+
+(my/enable-display-buffer-alist)
 
 ;; set custom-file to the equivalent of /dev/null
 (let ((devnull (cond
@@ -428,6 +443,8 @@ window is deleted if it's displayed and BUFFER is killed."
   (my/setq helm-move-to-line-cycle-in-source t)
   (my/setq helm-net-prefer-curl t)
   (my/setq helm-split-window-inside-p t)
+  (add-hook 'helm-after-initialize-hook #'my/disable-display-buffer-alist)
+  (add-hook 'helm-cleanup-hook #'my/enable-display-buffer-alist)
   (helm-mode))
 
 (use-package helm-gtags
