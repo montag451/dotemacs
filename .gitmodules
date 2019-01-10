@@ -180,6 +180,9 @@
 [submodule "shackle"]
 	path = lib/shackle
 	url = git@github.com:wasamasa/shackle.git
+[submodule "ssh-tunnels"]
+	path = lib/ssh-tunnels
+	url = git@github.com:death/ssh-tunnels.git
 [submodule "tablist"]
 	path = lib/tablist
 	url = git@github.com:politza/tablist.git
