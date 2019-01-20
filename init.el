@@ -19,6 +19,19 @@ value of the symbol."
                 def))))
     `(progn ,@(nreverse def))))
 
+(defun my/comint-load-history (histfile)
+  (lambda ()
+    (let* ((proc (get-buffer-process (current-buffer)))
+           (remote (file-remote-p default-directory))
+           (histfile (expand-file-name (concat remote histfile))))
+      (when proc
+        (setq comint-input-ring-file-name histfile)
+        (comint-read-input-ring)
+        (add-function
+         :before (process-sentinel proc)
+         (lambda (_proc _event)
+           (comint-write-input-ring)))))))
+
 ;; global variables
 (defvar my/plantuml-jar-path
   (expand-file-name (concat user-emacs-directory "plantuml.8057.jar"))
@@ -491,16 +504,7 @@ value of the symbol."
   :defer t
   :config
   (add-hook 'inferior-python-mode-hook
-            (lambda ()
-              (let ((proc (python-shell-get-process)))
-                (when proc
-                  (setq comint-input-ring-file-name
-                        (expand-file-name "~/.python_history"))
-                  (comint-read-input-ring)
-                  (add-function
-                   :before (process-sentinel proc)
-                   (lambda (_proc _event)
-                     (comint-write-input-ring))))))))
+            (my/comint-load-history "~/.python_history")))
 
 (use-package anaconda-mode
   :defer t
