@@ -489,6 +489,21 @@ window is deleted if it's displayed and BUFFER is killed."
   ("k" multi-term-prev "prev")
   ("n" nil))
 
+(use-package python
+  :defer t
+  :config
+  (add-hook 'inferior-python-mode-hook
+            (lambda ()
+              (let ((proc (python-shell-get-process)))
+                (when proc
+                  (setq comint-input-ring-file-name
+                        (expand-file-name "~/.python_history"))
+                  (comint-read-input-ring)
+                  (add-function
+                   :before (process-sentinel proc)
+                   (lambda (_proc _event)
+                     (comint-write-input-ring))))))))
+
 (use-package anaconda-mode
   :defer t
   :init
