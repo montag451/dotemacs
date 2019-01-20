@@ -273,21 +273,19 @@ value of the symbol."
   :config
   (define-key comint-mode-map (kbd "M-r") #'helm-comint-input-ring)
   (my/setq comint-scroll-to-bottom-on-input t)
-  (defun my/comint-clean-up-on-exit (buffer)
-    "Kill BUFFER and its window if it's displayed.
-When the inferior process of BUFFER is not live anymore, its
-window is deleted if it's displayed and BUFFER is killed."
-    (let ((proc (get-buffer-process buffer)))
-      (add-function :after (process-sentinel proc)
-                    (lambda (proc _event)
-                      (unless (process-live-p proc)
-                        (let* ((buf (process-buffer proc))
-                               (win (get-buffer-window buf)))
-                          (if win
-                              (quit-window t win)
-                            (kill-buffer buf))))))
-      buffer))
-  (advice-add 'make-comint-in-buffer :filter-return #'my/comint-clean-up-on-exit))
+  (add-hook 'comint-exec-hook
+            (lambda ()
+              (let ((proc (get-buffer-process (current-buffer))))
+                (when proc
+                  (add-function
+                   :after (process-sentinel proc)
+                   (lambda (proc _event)
+                     (unless (process-live-p proc)
+                       (let* ((buf (process-buffer proc))
+                              (win (get-buffer-window buf)))
+                         (if win
+                             (quit-window t win)
+                           (kill-buffer buf)))))))))))
 
 (use-package shell
   :defer t
