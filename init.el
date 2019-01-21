@@ -231,16 +231,6 @@ value of the symbol."
   (my/setq whitespace-line-column 80)
   (my/setq whitespace-style '(face tabs empty trailing lines-tail)))
 
-(use-package term
-  :defer t
-  :config
-  (add-hook 'term-mode-hook
-            (lambda ()
-              (define-key
-                evil-emacs-state-local-map
-                (kbd "C-z")
-                'term-send-raw))))
-
 (use-package compile
   :defer t
   :config
@@ -255,20 +245,6 @@ value of the symbol."
   :defer t
   :config
   (my/setq eldoc-minor-mode-string nil))
-
-(use-package edebug
-  :defer t
-  :config
-  (defvar my/state-before-edebug nil)
-  (add-hook 'edebug-mode-hook
-            (lambda ()
-              (when evil-local-mode
-                (if edebug-mode
-                    (progn
-                      (setq-local my/state-before-edebug evil-state)
-                      (when (not (evil-emacs-state-p))
-                        (evil-emacs-state)))
-                  (evil-change-state my/state-before-edebug))))))
 
 ;;; external packages
 
@@ -292,48 +268,6 @@ value of the symbol."
   :config
   (my/setq avy-keys (number-sequence ?a ?z))
   (my/setq avy-case-fold-search nil))
-
-;; evil-leader must be enabled before evil, otherwise evil-leader
-;; won't be enabled in initial buffer (*scratch*, *Messages*, ...)
-(use-package evil-leader
-  :config
-  (evil-leader/set-leader "<SPC>")
-  (evil-leader/set-key
-    "j" 'evil-avy-goto-char
-    "k" 'evil-avy-goto-word-0
-    "g" 'evil-avy-goto-line)
-  (global-evil-leader-mode))
-
-(use-package evil
-  :config
-  (defun my/fix-evil-hiding-minor-mode-map (&rest _args)
-    "See `https://github.com/syl20bnr/spacemacs/issues/9391'"
-    (let ((mjm-keymap (intern-soft (format "%s-map" major-mode))))
-      (when mjm-keymap
-        (setq evil-mode-map-alist
-              (cl-loop for (c . k) in evil-mode-map-alist
-                       unless (and (eq c t) (eq k (symbol-value mjm-keymap)))
-                       collect (cons c k))))))
-  (advice-add 'evil-normalize-keymaps :after #'my/fix-evil-hiding-minor-mode-map)
-  (my/setq evil-search-wrap nil)
-  (my/setq evil-symbol-word-search t)
-  (evil-set-initial-state 'term-mode 'emacs)
-  (evil-set-initial-state 'eshell-mode 'emacs)
-  (evil-set-initial-state 'shell-mode 'emacs)
-  (evil-set-initial-state 'inferior-emacs-lisp-mode 'emacs)
-  (evil-set-initial-state 'dired-mode 'emacs)
-  (evil-set-initial-state 'gud-mode 'emacs)
-  (evil-set-initial-state 'inferior-python-mode 'emacs)
-  (evil-set-initial-state 'erlang-shell-mode 'emacs)
-  (evil-set-initial-state 'haskell-interactive-mode 'emacs)
-  (evil-set-initial-state 'haskell-error-mode 'emacs)
-  (evil-set-initial-state 'image-mode 'emacs)
-  (evil-set-initial-state 'comint-mode 'emacs)
-  (evil-set-initial-state 'magit-submodule-list-mode 'emacs)
-  (evil-set-initial-state 'process-menu-mode 'emacs)
-  (evil-set-initial-state 'epkg-list-mode 'emacs)
-  (evil-set-initial-state 'epa-key-list-mode 'emacs)
-  (evil-mode))
 
 (use-package undo-tree
   :defer t
@@ -371,13 +305,6 @@ value of the symbol."
 
 (use-package helm-gtags
   :defer t
-  :init
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (let ((map evil-normal-state-local-map))
-                (define-key map (kbd "C-]") #'helm-gtags-dwim)
-                (define-key map (kbd "C-t") #'helm-gtags-pop-stack))
-              (helm-gtags-mode)))
   :config
   (my/setq helm-gtags-mode-name "")
   (let ((map helm-gtags-mode-map))
@@ -398,11 +325,6 @@ value of the symbol."
   (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
   :config
   (my/setq paredit-lighter ""))
-
-(use-package evil-paredit
-  :defer t
-  :init
-  (add-hook 'emacs-lisp-mode-hook #'evil-paredit-mode))
 
 (use-package company
   :defer t
