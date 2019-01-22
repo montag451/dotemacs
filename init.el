@@ -547,7 +547,7 @@ value of the symbol."
   (my/setq venv-location (expand-file-name "~/Prog/venv")))
 
 (use-package whole-line-or-region
-  :diminish
+  :diminish whole-line-or-region-local-mode
   :config
   (whole-line-or-region-global-mode))
 
