@@ -246,6 +246,10 @@ value of the symbol."
   :config
   (my/setq eldoc-minor-mode-string nil))
 
+(use-package delsel
+  :config
+  (delete-selection-mode))
+
 ;;; external packages
 
 (use-package auto-compile
