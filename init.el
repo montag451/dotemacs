@@ -524,7 +524,7 @@ value of the symbol."
   (my/setq inferior-erlang-machine-options '("-sname" "emacs")))
 
 (use-package bash-completion
-  :defer t
+  :after shell
   :init
   (add-to-list 'shell-dynamic-complete-functions #'bash-completion-dynamic-complete)
   :config
