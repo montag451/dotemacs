@@ -542,6 +542,11 @@ value of the symbol."
   :config
   (my/setq venv-location (expand-file-name "~/Prog/venv")))
 
+(use-package whole-line-or-region
+  :diminish
+  :config
+  (whole-line-or-region-global-mode))
+
 ;;; handy functions
 
 (defun my/list-buffers-with-mode (mode)
