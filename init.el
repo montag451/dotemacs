@@ -547,6 +547,9 @@ value of the symbol."
   :config
   (whole-line-or-region-global-mode))
 
+(use-package expand-region
+  :bind ("C-=" . er/expand-region))
+
 ;;; handy functions
 
 (defun my/list-buffers-with-mode (mode)
