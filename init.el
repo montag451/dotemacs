@@ -29,8 +29,9 @@ value of the symbol."
         (comint-read-input-ring)
         (add-function
          :before (process-sentinel proc)
-         (lambda (_proc _event)
-           (comint-write-input-ring)))))))
+         (lambda (proc _event)
+           (unless (process-live-p proc)
+             (comint-write-input-ring))))))))
 
 ;; global variables
 (defvar my/plantuml-jar-path
