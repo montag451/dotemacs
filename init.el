@@ -554,6 +554,11 @@ value of the symbol."
 (use-package expand-region
   :bind ("C-=" . er/expand-region))
 
+(use-package dot-mode
+  :diminish
+  :config
+  (global-dot-mode))
+
 ;;; handy functions
 
 (defun my/list-buffers-with-mode (mode)
