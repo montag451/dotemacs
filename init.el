@@ -145,11 +145,10 @@ value of the symbol."
 (use-package ediff-wind
   :defer t
   :config
-  (my/setq ediff-window-setup-function #'ediff-setup-windows-plain)
-  (my/setq ediff-split-window-function
+  (my/setq ediff-window-setup-function
            (lambda (&rest args)
              (let (window-combination-resize)
-               (apply #'split-window-vertically args)))))
+               (apply #'ediff-setup-windows-plain args)))))
 
 (use-package ediff-init
   :defer t
