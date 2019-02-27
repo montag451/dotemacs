@@ -370,6 +370,7 @@ value of the symbol."
   (my/setq projectile-completion-system 'helm)
   (my/setq projectile-use-git-grep t)
   (my/setq projectile-dynamic-mode-line nil)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode))
 
 (use-package helm-projectile
