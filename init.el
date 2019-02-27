@@ -115,6 +115,8 @@ value of the symbol."
 (my/setq case-fold-search nil)
 (my/setq case-replace nil)
 
+(global-set-key (kbd "C-*") #'isearch-forward-symbol-at-point)
+
 ;;; builtin packages
 
 (use-package help
