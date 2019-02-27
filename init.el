@@ -311,16 +311,21 @@ value of the symbol."
 
 (use-package helm-gtags
   :defer t
+  :init
+  (add-hook 'prog-mode-hook #'helm-gtags-mode)
   :config
   (my/setq helm-gtags-mode-name "")
-  (let ((map helm-gtags-mode-map))
-    (define-key map (kbd "C-c g s") #'helm-gtags-select)
-    (define-key map (kbd "C-c g f") #'helm-gtags-select-path)
-    (define-key map (kbd "C-c g u") #'helm-gtags-update-tags)
-    (define-key map (kbd "C-c g t") #'helm-gtags-show-stack)
-    (define-key map (kbd "C-c g r") #'helm-gtags-resume)
-    (define-key map (kbd "C-c g j") #'helm-gtags-next-history)
-    (define-key map (kbd "C-c g k") #'helm-gtags-previous-history)))
+  (let ((map helm-gtags-mode-map)
+        (prefix "C-c g"))
+    (define-key map (kbd (concat prefix "s")) #'helm-gtags-select)
+    (define-key map (kbd (concat prefix "f")) #'helm-gtags-select-path)
+    (define-key map (kbd (concat prefix "u")) #'helm-gtags-update-tags)
+    (define-key map (kbd (concat prefix "t")) #'helm-gtags-show-stack)
+    (define-key map (kbd (concat prefix "r")) #'helm-gtags-resume)
+    (define-key map (kbd (concat prefix "j")) #'helm-gtags-next-history)
+    (define-key map (kbd (concat prefix "k")) #'helm-gtags-previous-history)
+    (define-key map (kbd "M-.") #'helm-gtags-dwim)
+    (define-key map (kbd "M-,") #'helm-gtags-pop-stack)))
 
 (use-package paredit
   :defer t
