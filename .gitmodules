@@ -19,6 +19,12 @@
 [submodule "borg"]
 	path = lib/borg
 	url = git@github.com:emacscollective/borg.git
+[submodule "buttercup"]
+	path = lib/buttercup
+	url = git@github.com:jorgenschaefer/emacs-buttercup.git
+[submodule "cider"]
+	path = lib/cider
+	url = git@github.com:clojure-emacs/cider.git
 [submodule "clojure-mode"]
 	path = lib/clojure-mode
 	url = git@github.com:clojure-emacs/clojure-mode.git
@@ -174,6 +180,9 @@
 [submodule "pythonic"]
 	path = lib/pythonic
 	url = git@github.com:proofit404/pythonic.git
+[submodule "queue"]
+	path = lib/queue
+	url = git@github.com:emacsmirror/queue.git
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = git@github.com:Fanael/rainbow-delimiters.git
@@ -183,9 +192,15 @@
 [submodule "s"]
 	path = lib/s
 	url = git@github.com:magnars/s.el.git
+[submodule "sesman"]
+	path = lib/sesman
+	url = git@github.com:vspinu/sesman.git
 [submodule "shackle"]
 	path = lib/shackle
 	url = git@github.com:wasamasa/shackle.git
+[submodule "spinner"]
+	path = lib/spinner
+	url = git@github.com:Malabarba/spinner.el.git
 [submodule "ssh-tunnels"]
 	path = lib/ssh-tunnels
 	url = git@github.com:death/ssh-tunnels.git
