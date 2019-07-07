@@ -3,7 +3,7 @@
 ;; helper functions and macros
 (defmacro my/setq (&rest args)
   "A macro that behaves like `setq' except when a symbol has been defined
-using `defcustom'. In this case, it uses `customize-set-variable' to set the
+using `defcustom'.  In this case, it uses `customize-set-variable' to set the
 value of the symbol."
   (let (def)
     (while args
@@ -97,6 +97,90 @@ value of the symbol."
 ;; resize all the windows of a combination when one window of the
 ;; combination is deleted, it helps keeping the layout of frames
 (my/setq window-combination-resize t)
+
+(defvar my/display-buffer-alist nil)
+(defvar my/display-buffer-base-action nil)
+
+(defun my/display-buffer-and-select (functions)
+  (lambda (buffer alist)
+    (let ((functions (if (listp functions) functions (list functions)))
+          win)
+      (when (and (derived-mode-p 'help-mode)
+                 (not (with-current-buffer buffer
+                        (derived-mode-p 'help-mode))))
+        (when-let ((win (get-buffer-window)))
+          (quit-window nil win)
+          (my/setq functions (list #'display-buffer-same-window))))
+      (my/setq functions (cons #'display-buffer-reuse-window functions))
+      (while (and functions (not win))
+        (my/setq win (funcall (car functions) buffer alist)
+                 functions (cdr functions)))
+      (when win
+        (select-window win)))))
+
+(defun my/check-mode (mode)
+  (lambda (buffer _action)
+    (with-current-buffer buffer
+      (derived-mode-p mode))))
+
+(defun my/setup-display-buffer-alist(rules)
+  (let (computed-rules)
+    (dolist (rule rules)
+      (let* ((condition (car rule))
+             (plist (cdr rule))
+             (action-functions (plist-get plist :action-fns))
+             (action-alist (plist-get plist :action-alist))
+             (noselect (plist-get plist :noselect))
+             (default-action-functions '(display-buffer-reuse-window
+                                         display-buffer-pop-up-window))
+             (computed-condition
+              (pcase condition
+                ((pred stringp) condition)
+                ((pred symbolp) (my/check-mode condition))
+                (bad (error "Bad condition: %S" bad))))
+             (computed-action-functions
+              (cond
+               (noselect
+                (if (not action-functions)
+                    default-action-functions
+                  action-functions))
+               (action-functions
+                (my/display-buffer-and-select action-functions))
+               (t
+                (my/display-buffer-and-select default-action-functions)))))
+        (push (cons computed-condition
+                    (cons computed-action-functions action-alist))
+              computed-rules)))
+    (my/setq my/display-buffer-alist (nreverse computed-rules))
+    (my/setq my/display-buffer-base-action
+             (cons (my/display-buffer-and-select
+                    (car display-buffer-fallback-action))
+                   (cdr display-buffer-fallback-action)))))
+
+(defun my/enable-display-buffer-alist ()
+  (interactive)
+  (my/setq display-buffer-alist my/display-buffer-alist
+           display-buffer-base-action my/display-buffer-base-action))
+
+(defun my/disable-display-buffer-alist ()
+  (interactive)
+  (my/setq display-buffer-alist nil
+           display-buffer-base-action nil))
+
+(my/setup-display-buffer-alist
+ '((help-mode
+    :action-fns display-buffer-in-side-window
+    :action-alist ((side . bottom) (window-height . 0.4)))
+   (inferior-emacs-lisp-mode
+    :action-fns display-buffer-pop-up-window)
+   ("^\\*Man .*\\*$"
+    :action-fns display-buffer-in-side-window
+    :action-alist ((side . right) (window-width . fit-window-to-buffer)))
+   ("^\\*HTTP Response\\*$" :noselect t)
+   ("^\\*shell.*\\*$"
+    :action-fns display-buffer-same-window)))
+
+(my/enable-display-buffer-alist)
 
 ;; set custom-file to the equivalent of /dev/null
 (let ((devnull (cond
@@ -307,6 +391,8 @@ value of the symbol."
   (my/setq helm-move-to-line-cycle-in-source t)
   (my/setq helm-net-prefer-curl t)
   (my/setq helm-split-window-inside-p t)
+  (add-hook 'helm-after-initialize-hook #'my/disable-display-buffer-alist)
+  (add-hook 'helm-cleanup-hook #'my/enable-display-buffer-alist)
   (helm-mode))
 
 (use-package helm-gtags
@@ -500,20 +586,20 @@ value of the symbol."
   (my/setq which-key-lighter "")
   (which-key-mode))
 
-(use-package shackle
-  :config
-  (my/setq shackle-default-rule '(:select t))
-  (my/setq shackle-inhibit-window-quit-on-same-windows t)
-  (my/setq shackle-rules
-           '(("^\\*Man .*\\*$" :select t :regexp t :size 80 :align right)
-             (inferior-emacs-lisp-mode :popup t :select t :align below)
-             (help-mode :select t :size 0.4 :align below)
-             ("*Completions*" :noselect t)
-             ("*HTTP Response*" :noselect t)
-             ("\\*shell.*\\*" :regexp t :same t)))
-  (add-hook 'helm-after-initialize-hook (lambda () (shackle-mode -1)))
-  (add-hook 'helm-cleanup-hook #'shackle-mode)
-  (shackle-mode))
+;; (use-package shackle
+;;   :config
+;;   (my/setq shackle-default-rule '(:select t))
+;;   (my/setq shackle-inhibit-window-quit-on-same-windows t)
+;;   (my/setq shackle-rules
+;;            '(("^\\*Man .*\\*$" :select t :regexp t :size 80 :align right)
+;;              (inferior-emacs-lisp-mode :popup t :select t :align below)
+;;              (help-mode :select t :size 0.4 :align below)
+;;              ("*Completions*" :noselect t)
+;;              ("*HTTP Response*" :noselect t)
+;;              ("\\*shell.*\\*" :regexp t :same t)))
+;;   (add-hook 'helm-after-initialize-hook (lambda () (shackle-mode -1)))
+;;   (add-hook 'helm-cleanup-hook #'shackle-mode)
+;;   (shackle-mode))
 
 (use-package rainbow-delimiters
   :config
@@ -599,7 +685,7 @@ MODE is a symbol."
 (defun my/spawn-shell (dir &optional force)
   "Spawn a shell using DIR as the default directory.
 If FORCE is non-nil a new shell will be spawned even if one for
-the same user and the same host already exists. When called
+the same user and the same host already exists.  When called
 interactively with a prefix arg, FORCE is set to a non-nil
 value."
   (interactive "DDefault directory: \nP")
