@@ -146,7 +146,7 @@
 	url = git@github.com:purcell/mmm-mode.git
 [submodule "multi-term"]
 	path = lib/multi-term
-	url = git@github.com:emacsorphanage/multi-term.git
+	url = git@github.com:emacsmirror/multi-term.git
 [submodule "nix-mode"]
 	path = lib/nix-mode
 	url = git@github.com:NixOS/nix-mode.git
