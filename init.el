@@ -333,8 +333,7 @@ value of the symbol."
   (my/setq helm-completion-mode-string nil)
   (my/setq helm-mode-handle-completion-in-region nil)
   (add-to-list 'helm-completing-read-handlers-alist
-               '(xref-find-references)
-               '(xref-find-definitions))
+               '(xref-find-references))
   (helm-mode))
 
 (use-package helm-gtags
