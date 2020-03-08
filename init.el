@@ -281,32 +281,60 @@ value of the symbol."
   (my/setq undo-tree-mode-lighter ""))
 
 (use-package helm
-  :demand
-  :init
-  (require 'helm-config)
-  :bind (("M-x" . helm-M-x)
-         ("C-x C-f" . helm-find-files)
-         ("C-x b" . helm-mini)
-         :map helm-map
+  :bind (:map helm-map
          ("<tab>" . helm-execute-persistent-action)
          ("C-i" . helm-execute-persistent-action)
-         ("C-z" . helm-select-action)
-         :map helm-command-map
-         ("g" . helm-do-grep-ag)
-         :map isearch-mode-map
-         ("M-i" . helm-occur-from-isearch))
+         ("C-z" . helm-select-action))
   :config
-  (my/setq helm-completion-mode-string nil)
-  (my/setq helm-command-prefix-key "C-c h")
-  (my/setq helm-buffers-fuzzy-matching t)
-  (my/setq helm-recentf-fuzzy-match t)
-  (my/setq helm-M-x-fuzzy-match t)
+  (my/setq helm-move-to-line-cycle-in-source t)
+  (my/setq helm-split-window-inside-p t))
+
+(use-package helm-files
+  :bind (("C-x C-f" . helm-find-files))
+  :config
   (my/setq helm-ff-file-name-history-use-recentf t)
   (my/setq helm-ff-search-library-in-sexp t)
+  (my/setq helm-substitute-in-filename-stay-on-remote t)
+  (add-to-list 'helm-ff-goto-first-real-dired-exceptions 'dired-do-copy)
+  (add-to-list 'helm-ff-goto-first-real-dired-exceptions 'dired-do-rename))
+
+(use-package helm-buffers
+  :bind (("C-x b" . helm-mini))
+  :config
+  (my/setq helm-buffers-fuzzy-matching t))
+
+(use-package helm-for-files
+  :config
+  (my/setq helm-recentf-fuzzy-match t))
+
+(use-package helm-net
+  :config
+  (my/setq helm-net-prefer-curl t))
+
+(use-package helm-occur
+  :bind (:map isearch-mode-map
+         ("M-i" . helm-occur-from-isearch)))
+
+(use-package helm-command
+  :bind (("M-x" . helm-M-x))
+  :config
+  (my/setq helm-M-x-fuzzy-match t))
+
+(use-package helm-config
+  :demand
+  :bind (:map helm-command-map
+         ("g" . helm-do-grep-ag))
+  :config
+  (my/setq helm-command-prefix-key "C-c h"))
+
+(use-package helm-mode
+  :demand
+  :config
+  (my/setq helm-completion-mode-string nil)
   (my/setq helm-mode-handle-completion-in-region nil)
-  (my/setq helm-move-to-line-cycle-in-source t)
-  (my/setq helm-net-prefer-curl t)
-  (my/setq helm-split-window-inside-p t)
+  (add-to-list 'helm-completing-read-handlers-alist
+               '(xref-find-references)
+               '(xref-find-definitions))
   (helm-mode))
 
 (use-package helm-gtags
