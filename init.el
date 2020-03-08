@@ -304,10 +304,12 @@ value of the symbol."
   (my/setq helm-buffers-fuzzy-matching t))
 
 (use-package helm-for-files
+  :defer t
   :config
   (my/setq helm-recentf-fuzzy-match t))
 
 (use-package helm-net
+  :defer t
   :config
   (my/setq helm-net-prefer-curl t))
 
@@ -328,7 +330,6 @@ value of the symbol."
   (my/setq helm-command-prefix-key "C-c h"))
 
 (use-package helm-mode
-  :demand
   :config
   (my/setq helm-completion-mode-string nil)
   (my/setq helm-mode-handle-completion-in-region nil)
