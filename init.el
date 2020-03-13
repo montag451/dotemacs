@@ -275,11 +275,6 @@ value of the symbol."
   (my/setq avy-keys (number-sequence ?a ?z))
   (my/setq avy-case-fold-search nil))
 
-(use-package undo-tree
-  :defer t
-  :config
-  (my/setq undo-tree-mode-lighter ""))
-
 (use-package helm
   :bind (:map helm-map
          ("<tab>" . helm-execute-persistent-action)
