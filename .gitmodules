@@ -62,16 +62,6 @@
 	path = lib/erlang
 	url = git@github.com:erlang/otp.git
 	load-path = lib/tools/emacs
-[submodule "evil"]
-	path = lib/evil
-	url = git@github.com:emacs-evil/evil.git
-        info-path = doc
-[submodule "evil-leader"]
-	path = lib/evil-leader
-	url = git@github.com:cofi/evil-leader.git
-[submodule "evil-paredit"]
-	path = lib/evil-paredit
-	url = git@github.com:roman/evil-paredit.git
 [submodule "expand-region"]
 	path = lib/expand-region
 	url = git@github.com:magnars/expand-region.el.git
