@@ -585,6 +585,9 @@ value of the symbol."
 (use-package expand-region
   :bind ("C-=" . er/expand-region))
 
+(use-package jq-mode
+  :mode (("\\.jq\\'" . jq-mode)))
+
 ;;; handy functions
 
 (defun my/list-buffers-with-mode (mode)
