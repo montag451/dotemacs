@@ -108,6 +108,9 @@
 [submodule "jinja2-mode"]
 	path = lib/jinja2-mode
 	url = git@github.com:paradoxxxzero/jinja2-mode.git
+[submodule "jq-mode"]
+	path = lib/jq-mode
+	url = git@github.com:ljos/jq-mode.git
 [submodule "json-mode"]
 	path = lib/json-mode
 	url = git@github.com:joshwnj/json-mode.git
