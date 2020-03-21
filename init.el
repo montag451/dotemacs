@@ -588,6 +588,11 @@ value of the symbol."
 (use-package jq-mode
   :mode (("\\.jq\\'" . jq-mode)))
 
+(use-package helm-lxc
+  :defer t
+  :config
+  (add-to-list 'helm-lxc-hosts '("localhost (unprivilegied)")))
+
 ;;; handy functions
 
 (defun my/list-buffers-with-mode (mode)
