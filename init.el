@@ -593,6 +593,12 @@ value of the symbol."
   :config
   (add-to-list 'helm-lxc-hosts '("localhost (unprivilegied)")))
 
+(use-package with-editor
+  :config
+  (add-hook 'shell-mode-hook  'with-editor-export-editor)
+  (add-hook 'term-exec-hook   'with-editor-export-editor)
+  (add-hook 'eshell-mode-hook 'with-editor-export-editor))
+
 ;;; handy functions
 
 (defun my/list-buffers-with-mode (mode)
