@@ -194,6 +194,9 @@
 [submodule "s"]
 	path = lib/s
 	url = git@github.com:magnars/s.el.git
+[submodule "sed-mode"]
+	path = lib/sed-mode
+	url = git@github.com:emacsmirror/sed-mode.git
 [submodule "sesman"]
 	path = lib/sesman
 	url = git@github.com:vspinu/sesman.git
