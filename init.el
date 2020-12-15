@@ -471,6 +471,17 @@ value of the symbol."
   :config
   (my/setq anaconda-mode-lighter ""))
 
+(use-package go-mode
+  :defer t
+  :config
+  (add-to-list 'exec-path (expand-file-name "~/go/bin"))
+  (setq gofmt-command "goimports")
+  (add-hook 'go-mode-hook
+            (lambda ()
+              (my/setq tab-width 4)
+              (whitespace-toggle-options 'tabs)))
+  (add-hook 'before-save-hook #'gofmt-before-save))
+
 (use-package haskell-mode
   :defer t
   :config
