@@ -252,6 +252,16 @@ value of the symbol."
   :config
   (delete-selection-mode))
 
+(use-package calc
+  :defer t
+  :config
+  (add-hook 'calc-mode-hook
+            (lambda ()
+              (whole-line-or-region-local-mode -1)))
+  (add-hook 'calc-trail-mode-hook
+            (lambda ()
+              (whole-line-or-region-local-mode -1))))
+
 ;;; external packages
 
 (use-package auto-compile
