@@ -33,27 +33,103 @@ value of the symbol."
            (unless (process-live-p proc)
              (comint-write-input-ring))))))))
 
-;; global variables
-(defvar my/plantuml-jar-path
-  (expand-file-name (concat user-emacs-directory "plantuml.8057.jar"))
-  "Path of the plantuml jar file")
+(defun my/list-buffers-with-mode (mode)
+  "List all buffers with `major-mode' MODE.
+MODE is a symbol."
+  (save-current-buffer
+    (let (bufs)
+      (dolist (buf (buffer-list))
+        (set-buffer buf)
+        (and (equal major-mode mode)
+             (push (buffer-name buf) bufs)))
+      (nreverse bufs))))
 
-;; disable package.el
+;; (defun my/helm-switch-to-shell-buffer ()
+;;   (interactive)
+;;   (let ((buffers (my/list-buffers-with-mode 'shell-mode)))
+;;     (if buffers
+;;         (switch-to-buffer
+;;          (helm-comp-read
+;;           "Switch to shell buffer: "
+;;           buffers
+;;           :name "Shell buffers"))
+;;       (message "No shell buffer found!"))))
+
+(defun my/vertico-switch-to-shell-buffer ()
+  (interactive)
+  (let ((buffers (my/list-buffers-with-mode 'shell-mode)))
+    (if buffers
+        (switch-to-buffer
+         (completing-read
+          "Switch to shell buffer: "
+          buffers))
+      (message "No shell buffer found!"))))
+
+(defun my/get-bash-path ()
+  (let ((shell-file-name "/bin/sh"))
+    (with-temp-buffer
+      (unless (zerop (shell-command "bash -c \"type -p bash\"" t))
+        (error "Cannot find bash on %s"
+               (or (file-remote-p default-directory 'host)
+                   (system-name))))
+      (goto-char (point-min))
+      (buffer-substring-no-properties (point) (line-end-position)))))
+
+(defun my/get-user ()
+  (if (file-remote-p default-directory)
+      (with-temp-buffer
+        (unless (zerop (shell-command "echo $USER" t))
+          (error "Cannot find remote user on %s"
+                 (file-remote-p default-directory 'host)))
+        (goto-char (point-min))
+        (buffer-substring-no-properties (point) (line-end-position)))
+    user-login-name))
+
+(defun my/spawn-shell (dir &optional force)
+  "Spawn a shell using DIR as the default directory.
+If FORCE is non-nil a new shell will be spawned even if one for
+the same user and the same host already exists. When called
+interactively with a prefix arg, FORCE is set to a non-nil
+value."
+  (interactive "DDefault directory: \nP")
+  (require 'shell)
+  (let* ((default-directory dir)
+         (remote (file-remote-p dir))
+         (host (or (file-remote-p dir 'host) (system-name)))
+         (buffer (format "*shell %s@%s*" (my/get-user) host))
+         (histfile-env-name "HISTFILE")
+         (prev-histfile (getenv histfile-env-name)))
+    (unwind-protect
+        (let ((histfile (expand-file-name (concat remote "~/.bash_history")))
+              (tramp-histfile-override nil))
+          (when remote
+            (setenv histfile-env-name histfile))
+          (shell (if force
+                     (generate-new-buffer-name buffer)
+                   buffer)))
+      (setenv histfile-env-name prev-histfile))))
+
+(defun my/spawn-shell-same-window (dir &optional force)
+  (interactive "DDefault directory: \nP")
+  (let ((display-buffer-overriding-action '(display-buffer-same-window)))
+    (my/spawn-shell dir force)))
+
+(defun my/kill-shell-buffers ()
+  (interactive)
+  (dolist (buffer (my/list-buffers-with-mode 'shell-mode))
+    (with-current-buffer buffer
+      (comint-send-eof))))
+
+(global-set-key (kbd "C-c s s") #'my/vertico-switch-to-shell-buffer)
+(global-set-key (kbd "C-c s p") #'my/spawn-shell)
+(global-set-key (kbd "C-c s x") #'my/spawn-shell-same-window)
+
 (require 'package)
-(my/setq package-enable-at-startup nil)
-
-;; configure borg
-(add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
-(require 'borg)
-(borg-initialize)
-
-;; when the init file is byte-compiled, use-package is autoloaded and
-;; all invocations of `use-package' are expanded and no reference to
-;; functions or variables defined by use-package exists anymore in the
-;; expansion, expect for the variable `personal-keybindings' which is
-;; used to register all bindings made with use-package. So to prevent
-;; the use of an undefined variable we need to load use-package
-(require 'use-package)
+(add-to-list 'package-archives
+             '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
 
 ;; always load the latest version of file
 (my/setq load-prefer-newer t)
@@ -94,28 +170,41 @@ value of the symbol."
     (when font
       (add-to-list 'default-frame-alist (cons 'font font)))))
 
-;; resize all the windows of a combination when one window of the
-;; combination is deleted, it helps keeping the layout of frames
-(my/setq window-combination-resize t)
+;; use UTF-8 with UNIX EOL if possible
+(prefer-coding-system 'utf-8-unix)
 
-;; set custom-file to the equivalent of /dev/null
-(let ((devnull (cond
-                ((or (eq system-type 'gnu/linux)
-                     (eq system-type 'cygwin)
-                     (eq system-type 'darwin))
-                 "/dev/null")
-                ((or (eq system-type 'ms-dos)
-                     (eq system-type 'windows-nt))
-                 "nul")
-                (t
-                 (error "Unknown system: %s" system-type)))))
-  (my/setq custom-file devnull))
+;; store customized variables into custom.el. This file is not used.
+(my/setq custom-file (expand-file-name "~/.emacs.d/custom.el"))
 
-;; make Emacs case sensitive when searching/replacing/completing
+;; make Emacs case sensitive when searching/replacing
 (my/setq case-fold-search nil)
 (my/setq case-replace nil)
 
+;; search for the symbol at point a la VIM
 (global-set-key (kbd "C-*") #'isearch-forward-symbol-at-point)
+
+;; remove duplicates entry from history
+(my/setq history-delete-duplicates t)
+
+(connection-local-set-profile-variables
+ 'remote-bash
+ '((explicit-shell-file-name . "/bin/bash")
+   (shell-command-switch . "-c")))
+(connection-local-set-profile-variables
+ 'remote-nixos-bash
+ '((explicit-shell-file-name . "/usr/bin/env")
+   (explicit-env-args . ("bash" "--noediting" "-i"))))
+(connection-local-set-profiles
+ '(:application tramp) 'remote-bash)
+(connection-local-set-profiles
+ '(:application tramp :machine "vps300614.ovh.net") 'remote-nixos-bash)
+
+;; install use-package if necessary
+(when (not (package-installed-p 'use-package))
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(my/setq use-package-always-pin "melpa-stable")
 
 ;;; builtin packages
 
@@ -135,8 +224,8 @@ value of the symbol."
   (my/setq select-enable-primary t))
 
 (use-package recentf
-  :defer t
   :config
+  (recentf-mode)
   (my/setq recentf-auto-cleanup 'never))
 
 (use-package cc-vars
@@ -202,7 +291,7 @@ value of the symbol."
 (use-package comint
   :defer t
   :config
-  (define-key comint-mode-map (kbd "M-r") #'helm-comint-input-ring)
+  ;; (define-key comint-mode-map (kbd "M-r") #'helm-comint-input-ring)
   (my/setq comint-scroll-to-bottom-on-input t)
   (add-hook 'comint-exec-hook
             (lambda ()
@@ -252,115 +341,166 @@ value of the symbol."
   :config
   (delete-selection-mode))
 
-(use-package calc
+(use-package tramp
   :defer t
   :config
-  (add-hook 'calc-mode-hook
-            (lambda ()
-              (whole-line-or-region-local-mode -1)))
-  (add-hook 'calc-trail-mode-hook
-            (lambda ()
-              (whole-line-or-region-local-mode -1))))
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+
+(use-package isearch
+  :defer t
+  :config
+  (my/setq isearch-lazy-count t))
+
+(use-package minibuffer
+  :defer t
+  :config
+  (my/setq
+   completion-category-overrides
+   '((file (styles basic partial-completion))
+     (eval (styles basic partial-completion)))))
 
 ;;; external packages
 
-(use-package auto-compile
-  :config
-  (auto-compile-on-load-mode)
-  (auto-compile-on-save-mode)
-  (my/setq auto-compile-display-buffer nil)
-  (my/setq auto-compile-mode-line-counter t)
-  (my/setq auto-compile-source-recreate-deletes-dest t)
-  (my/setq auto-compile-toggle-deletes-nonlib-dest t)
-  (my/setq auto-compile-update-autoloads t)
-  (add-hook 'auto-compile-inhibit-compile-hook
-            #'auto-compile-inhibit-compile-detached-git-head))
+(use-package diminish
+  :ensure t
+  :defer t)
 
 (use-package zenburn-theme
+  :ensure t
   :config
   (load-theme 'zenburn t))
 
 (use-package avy
+  :ensure t
   :config
   (my/setq avy-keys (number-sequence ?a ?z))
   (my/setq avy-case-fold-search nil))
 
-(use-package helm
-  :bind (:map helm-map
-         ("<tab>" . helm-execute-persistent-action)
-         ("C-i" . helm-execute-persistent-action)
-         ("C-z" . helm-select-action))
+(use-package vertico
+  :ensure t
+  :pin gnu
   :config
-  (my/setq helm-move-to-line-cycle-in-source t)
-  (my/setq helm-split-window-inside-p t))
+  (vertico-mode)
+  (define-key vertico-map (kbd "RET") #'vertico-directory-enter)
+  (define-key vertico-map (kbd "M-DEL") #'vertico-directory-delete-word)
+  (define-key vertico-map (kbd "M-V") #'vertico-multiform-vertical)
+  (define-key vertico-map (kbd "M-G") #'vertico-multiform-grid)
+  (define-key vertico-map (kbd "M-F") #'vertico-multiform-flat)
+  (vertico-multiform-mode)
+  (my/setq vertico-multiform-categories
+           '((command (vertico-sort-override-function . vertico-sort-history-length-alpha)))))
 
-(use-package helm-files
-  :bind (("C-x C-f" . helm-find-files))
+(use-package orderless
+  :ensure t
   :config
-  (my/setq helm-ff-file-name-history-use-recentf t)
-  (my/setq helm-ff-search-library-in-sexp t)
-  (my/setq helm-substitute-in-filename-stay-on-remote t)
-  (add-to-list 'helm-ff-goto-first-real-dired-exceptions 'dired-do-copy)
-  (add-to-list 'helm-ff-goto-first-real-dired-exceptions 'dired-do-rename))
+  (my/setq completion-styles '(orderless basic partial-completion)))
 
-(use-package helm-buffers
-  :bind (("C-x b" . helm-mini))
+(use-package marginalia
+  :ensure t
   :config
-  (my/setq helm-buffers-fuzzy-matching t))
+  (marginalia-mode)
+  (add-to-list 'marginalia-command-categories '(eval-expression . eval)))
 
-(use-package helm-for-files
-  :defer t
+(use-package consult
+  :ensure t
   :config
-  (my/setq helm-recentf-fuzzy-match t))
+  (my/setq consult-narrow-key (kbd "<"))
+  (with-eval-after-load 'vertico-multiform
+    (add-to-list 'vertico-multiform-commands '(consult-imenu buffer))
+    (add-to-list 'vertico-multiform-commands '(consult-grep buffer)))
+  (global-set-key (kbd "C-c h i") #'consult-imenu)
+  (global-set-key (kbd "C-c h m") #'consult-man)
+  (global-set-key (kbd "C-x b") #'consult-buffer))
 
-(use-package helm-net
-  :defer t
+(use-package embark
+  :ensure t
+  :bind (("C-." . embark-act)
+         ("M-." . embark-dwim))
   :config
-  (my/setq helm-net-prefer-curl t))
+  (with-eval-after-load 'consult
+    ;; TODO: improvement
+    (eval `(defun my/grep (dir)
+             ,(documentation 'consult-grep)
+             (interactive "sDirectory: ")
+             (consult-grep dir)))
+    (define-key embark-file-map (kbd "g") #'my/grep)))
 
-(use-package helm-occur
-  :bind (:map isearch-mode-map
-         ("M-i" . helm-occur-from-isearch)))
-
-(use-package helm-command
-  :bind (("M-x" . helm-M-x))
+(use-package corfu
+  :ensure t
+  :pin gnu
   :config
-  (my/setq helm-M-x-fuzzy-match t))
+  (my/setq tab-always-indent 'complete)
+  (my/setq c-tab-always-indent 'complete)
+  (global-corfu-mode))
 
-(use-package helm-config
-  :demand
-  :bind (:map helm-command-map
-         ("g" . helm-do-grep-ag))
-  :config
-  (my/setq helm-command-prefix-key "C-c h"))
-
-(use-package helm-mode
-  :config
-  (my/setq helm-completion-mode-string nil)
-  (my/setq helm-mode-handle-completion-in-region nil)
-  (add-to-list 'helm-completing-read-handlers-alist
-               '(xref-find-references))
-  (helm-mode))
-
-(use-package helm-gtags
-  :defer t
+(use-package cape
+  :ensure t
+  :pin gnu
   :init
-  (add-hook 'prog-mode-hook #'helm-gtags-mode)
-  :config
-  (my/setq helm-gtags-mode-name "")
-  (let ((map helm-gtags-mode-map)
-        (prefix "C-c g"))
-    (define-key map (kbd (concat prefix "s")) #'helm-gtags-select)
-    (define-key map (kbd (concat prefix "f")) #'helm-gtags-select-path)
-    (define-key map (kbd (concat prefix "u")) #'helm-gtags-update-tags)
-    (define-key map (kbd (concat prefix "t")) #'helm-gtags-show-stack)
-    (define-key map (kbd (concat prefix "r")) #'helm-gtags-resume)
-    (define-key map (kbd (concat prefix "j")) #'helm-gtags-next-history)
-    (define-key map (kbd (concat prefix "k")) #'helm-gtags-previous-history)
-    (define-key map (kbd "M-.") #'helm-gtags-dwim)
-    (define-key map (kbd "M-,") #'helm-gtags-pop-stack)))
+  (add-hook 'completion-at-point-functions #'cape-line)
+  (add-hook 'completion-at-point-functions #'cape-dabbrev))
+
+;; (use-package helm
+;;   :ensure t
+;;   :bind (:map helm-map
+;;               ("<tab>" . helm-execute-persistent-action)
+;;               ("C-i" . helm-execute-persistent-action)
+;;               ("C-z" . helm-select-action))
+;;   :config
+;;   (my/setq helm-move-to-line-cycle-in-source t)
+;;   (my/setq helm-split-window-inside-p t))
+
+;; (use-package helm-files
+;;   :bind (("C-x C-f" . helm-find-files))
+;;   :config
+;;   (my/setq helm-ff-file-name-history-use-recentf t)
+;;   (my/setq helm-ff-search-library-in-sexp t)
+;;   (my/setq helm-ff-keep-cached-candidates 'local)
+;;   (my/setq helm-substitute-in-filename-stay-on-remote t)
+;;   (add-to-list 'helm-ff-goto-first-real-dired-exceptions 'dired-do-copy)
+;;   (add-to-list 'helm-ff-goto-first-real-dired-exceptions 'dired-do-rename))
+
+;; (use-package helm-buffers
+;;   :bind (("C-x b" . helm-mini))
+;;   :config
+;;   (my/setq helm-buffers-fuzzy-matching t))
+
+;; (use-package helm-for-files
+;;   :defer t
+;;   :config
+;;   (my/setq helm-recentf-fuzzy-match t))
+
+;; (use-package helm-net
+;;   :defer t
+;;   :config
+;;   (my/setq helm-net-prefer-curl t))
+
+;; (use-package helm-occur
+;;   :bind (:map isearch-mode-map
+;;               ("M-i" . helm-occur-from-isearch)))
+
+;; (use-package helm-command
+;;   :bind (("M-x" . helm-M-x))
+;;   :config
+;;   (my/setq helm-M-x-fuzzy-match t))
+
+;; (use-package helm-global-bindings
+;;   :demand
+;;   :bind (:map helm-command-map
+;;               ("g" . helm-do-grep-ag))
+;;   :config
+;;   (my/setq helm-command-prefix-key "C-c h"))
+
+;; (use-package helm-mode
+;;   :config
+;;   (my/setq helm-completion-mode-string nil)
+;;   (my/setq helm-mode-handle-completion-in-region nil)
+;;   (add-to-list 'helm-completing-read-handlers-alist
+;;                '(xref-find-references))
+;;   (helm-mode))
 
 (use-package paredit
+  :ensure t
   :defer t
   :init
   (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
@@ -370,48 +510,26 @@ value of the symbol."
   :config
   (my/setq paredit-lighter ""))
 
-(use-package company
-  :defer t
-  :init
-  (add-hook 'after-init-hook #'global-company-mode)
-  :config
-  (my/setq company-frontends '(company-pseudo-tooltip-frontend
-                               company-preview-if-just-one-frontend
-                               company-echo-metadata-frontend))
-  (my/setq company-lighter "")
-  (my/setq company-show-numbers t))
-
-(use-package company-quickhelp
-  :after company
-  :config
-  (company-quickhelp-mode))
-
-(use-package company-restclient
-  :after company
-  :config
-  (add-to-list 'company-backends #'company-restclient))
-
-(use-package company-anaconda
-  :after company
-  :config
-  (add-to-list 'company-backends #'company-anaconda))
-
 (use-package projectile
+  :ensure t
   :init
   (my/setq projectile-mode-line-prefix "")
   :config
-  (my/setq projectile-completion-system 'helm)
+  ;; (my/setq projectile-completion-system 'helm)
   (my/setq projectile-use-git-grep t)
   (my/setq projectile-dynamic-mode-line nil)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode))
 
-(use-package helm-projectile
-  :after helm projectile
-  :config
-  (helm-projectile-on))
+;; (use-package helm-projectile
+;;   :ensure t
+;;   :after helm projectile
+;;   :config
+;;   (helm-projectile-on))
 
 (use-package magit
+  :ensure t
+  :pin melpa
   :bind (("C-x g" . magit-status)
          ("C-x M-g" . magit-dispatch-popup))
   :config
@@ -420,16 +538,8 @@ value of the symbol."
                           'magit-insert-modules-unpulled-from-upstream
                           'magit-insert-unpulled-from-upstream))
 
-(use-package multi-term
-  :defer t
-  :config
-  (my/setq multi-term-dedicated-select-after-open-p t)
-  (my/setq term-bind-key-alist '(("C-c C-c" . term-interrupt-subjob)
-                                 ("C-c C-j" . term-line-mode)
-                                 ("C-c C-k" . term-char-mode)))
-  (my/setq term-unbind-key-list '("C-x" "C-c" "C-h" "C-y" "M-x" "M-:")))
-
 (use-package hydra
+  :ensure t
   :defer t
   :config
   (my/setq hydra-is-helpful nil))
@@ -454,64 +564,39 @@ value of the symbol."
   ("=" balance-windows "balance")
   ("x" delete-window "delete")
   ("X" delete-other-windows "delete other windows")
-  ("b" helm-mini "switch buffer")
-  ("f" helm-find-files "find files")
+  ;; ("b" helm-mini "switch buffer")
+  ;; ("f" helm-find-files "find files")
+  ("b" switch-to-buffer "switch buffer")
+  ("f" find-files "find files")
   ("t" multi-term "term")
   ("n" nil))
 
-;; hydra for multi-term
-(defhydra hydra-multi-term (global-map "C-x t" :color red)
-  "Multiple terminal"
-  ("t" multi-term "create")
-  ("j" multi-term-next "next")
-  ("k" multi-term-prev "prev")
-  ("n" nil))
-
 (use-package python
+  :ensure t
   :defer t
   :config
   (add-hook 'inferior-python-mode-hook
             (my/comint-load-history "~/.python_history")))
 
-(use-package anaconda-mode
-  :defer t
-  :init
-  (add-hook 'python-mode-hook #'anaconda-mode)
-  (add-hook 'python-mode-hook #'anaconda-eldoc-mode)
-  :config
-  (my/setq anaconda-mode-lighter ""))
-
 (use-package go-mode
+  :ensure t
+  :pin melpa
   :defer t
   :config
   (add-to-list 'exec-path (expand-file-name "~/go/bin"))
-  (setq gofmt-command "goimports")
+  (my/setq gofmt-command "goimports")
   (add-hook 'go-mode-hook
             (lambda ()
               (my/setq tab-width 4)
               (whitespace-toggle-options 'tabs)))
   (add-hook 'before-save-hook #'gofmt-before-save))
 
-(use-package haskell-mode
-  :defer t
-  :config
-  (add-hook 'haskell-mode-hook #'subword-mode)
-  (add-hook 'haskell-mode-hook #'haskell-doc-mode)
-  (add-hook 'haskell-mode-hook #'haskell-indentation-mode)
-  (add-hook 'haskell-mode-hook #'interactive-haskell-mode)
-  (my/setq haskell-hoogle-command nil)
-  (my/setq haskell-hoogle-url "http://hoogle.haskell.org/?hoogle=%s")
-  (my/setq haskell-process-type 'stack-ghci))
-
-(use-package plantuml-mode
-  :defer t
-  :config
-  (my/setq plantuml-jar-path my/plantuml-jar-path))
-
 (use-package jinja2-mode
+  :ensure t
   :mode (("\\.j2\\'" . jinja2-mode)))
 
 (use-package org
+  :ensure t
   :defer t
   :init
   (global-set-key (kbd "C-c a") #'org-agenda)
@@ -534,48 +619,27 @@ value of the symbol."
                                       (emacs-lisp . t)
                                       (gnuplot . t))))
 
-(use-package ob-plantuml
-  :defer t
-  :config
-  (my/setq org-plantuml-jar-path my/plantuml-jar-path))
-
 (use-package which-key
+  :ensure t
   :config
   (my/setq which-key-lighter "")
   (which-key-mode))
 
-(use-package shackle
-  :config
-  (my/setq shackle-default-rule '(:select t))
-  (my/setq shackle-inhibit-window-quit-on-same-windows t)
-  (my/setq shackle-rules
-           '(("^\\*Man .*\\*$" :select t :regexp t :size 80 :align right)
-             (inferior-emacs-lisp-mode :popup t :select t :align below)
-             (help-mode :select t :size 0.4 :align below)
-             ("*Completions*" :noselect t)
-             ("*HTTP Response*" :noselect t)
-             ("\\*shell.*\\*" :regexp t :same t)))
-  (add-hook 'helm-after-initialize-hook (lambda () (shackle-mode -1)))
-  (add-hook 'helm-cleanup-hook #'shackle-mode)
-  (shackle-mode))
-
 (use-package rainbow-delimiters
+  :ensure t
   :config
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
 (use-package aggressive-indent
+  :ensure t
   :diminish
   :defer t
   :init
   (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
   (add-hook 'lisp-mode-hook #'aggressive-indent-mode))
 
-(use-package erlang
-  :defer t
-  :config
-  (my/setq inferior-erlang-machine-options '("-sname" "emacs")))
-
 (use-package bash-completion
+  :ensure t
   :after shell
   :init
   (add-to-list 'shell-dynamic-complete-functions #'bash-completion-dynamic-complete)
@@ -585,114 +649,43 @@ value of the symbol."
   (my/setq bash-completion-args '("bash" "--noediting" "-l" "-i")))
 
 (use-package eyebrowse
+  :ensure t
+  :pin melpa
   :config
   (my/setq eyebrowse-new-workspace t)
   (eyebrowse-mode))
 
-(use-package pdf-tools
-  :config
-  (pdf-tools-install))
-
-(use-package virtualenvwrapper
-  :defer t
-  :config
-  (my/setq venv-location (expand-file-name "~/Prog/venv")))
-
 (use-package whole-line-or-region
+  :ensure t
   :diminish whole-line-or-region-local-mode
   :config
-  (whole-line-or-region-global-mode))
+  (whole-line-or-region-global-mode)
+  (add-hook 'calc-mode-hook
+            (lambda ()
+              (whole-line-or-region-local-mode -1)))
+  (add-hook 'calc-trail-mode-hook
+            (lambda ()
+              (whole-line-or-region-local-mode -1))))
 
 (use-package expand-region
+  :ensure t
   :bind ("C-=" . er/expand-region))
 
 (use-package jq-mode
+  :ensure t
   :mode (("\\.jq\\'" . jq-mode)))
 
-(use-package helm-lxc
-  :defer t
-  :config
-  (add-to-list 'helm-lxc-hosts '("localhost (unprivilegied)")))
-
 (use-package with-editor
+  :ensure t
   :config
   (add-hook 'shell-mode-hook  'with-editor-export-editor)
   (add-hook 'term-exec-hook   'with-editor-export-editor)
   (add-hook 'eshell-mode-hook 'with-editor-export-editor))
 
-;;; handy functions
+(use-package powershell
+  :ensure t
+  :pin melpa)
 
-(defun my/list-buffers-with-mode (mode)
-  "List all buffers with `major-mode' MODE.
-MODE is a symbol."
-  (save-current-buffer
-    (let (bufs)
-      (dolist (buf (buffer-list))
-        (set-buffer buf)
-        (and (equal major-mode mode)
-             (push (buffer-name buf) bufs)))
-      (nreverse bufs))))
-
-(defun my/helm-switch-to-shell-buffer ()
-  (interactive)
-  (let ((buffers (my/list-buffers-with-mode 'shell-mode)))
-    (if buffers
-        (switch-to-buffer
-         (helm-comp-read
-          "Switch to shell buffer: "
-          buffers
-          :name "Shell buffers"))
-      (message "No shell buffer found!"))))
-
-(defun my/get-bash-path ()
-  (let ((shell-file-name "/bin/sh"))
-    (with-temp-buffer
-      (unless (zerop (shell-command "bash -c \"type -p bash\"" t))
-        (error "Cannot find bash on %s"
-               (or (file-remote-p default-directory 'host)
-                   (system-name))))
-      (goto-char (point-min))
-      (buffer-substring-no-properties (point) (line-end-position)))))
-
-(defun my/spawn-shell (dir &optional force)
-  "Spawn a shell using DIR as the default directory.
-If FORCE is non-nil a new shell will be spawned even if one for
-the same user and the same host already exists. When called
-interactively with a prefix arg, FORCE is set to a non-nil
-value."
-  (interactive "DDefault directory: \nP")
-  (require 'shell)
-  (let* ((default-directory dir)
-         (remote (file-remote-p dir))
-         (user (or (file-remote-p dir 'user) (user-login-name)))
-         (host (or (file-remote-p dir 'host) (system-name)))
-         (buffer (format "*shell %s@%s*" user host))
-         (shell-file-name (or (and remote
-                                   (my/get-bash-path))
-                              shell-file-name))
-         (histfile-env-name "HISTFILE")
-         (prev-histfile (getenv histfile-env-name)))
-    (unwind-protect
-        (let ((histfile (expand-file-name (concat remote "~/.bash_history")))
-              (tramp-histfile-override nil))
-          (when remote
-            (setenv histfile-env-name histfile))
-          (shell (if force
-                     (generate-new-buffer-name buffer)
-                   buffer)))
-      (setenv histfile-env-name prev-histfile))))
-
-(defun my/spawn-shell-same-window (dir &optional force)
-  (interactive "DDefault directory: \nP")
-  (let ((display-buffer-overriding-action '(display-buffer-same-window)))
-    (my/spawn-shell dir force)))
-
-(defun my/kill-shell-buffers ()
-  (interactive)
-  (dolist (buffer (my/list-buffers-with-mode 'shell-mode))
-    (with-current-buffer buffer
-      (comint-send-eof))))
-
-(global-set-key (kbd "C-c s s") #'my/helm-switch-to-shell-buffer)
-(global-set-key (kbd "C-c s p") #'my/spawn-shell)
-(global-set-key (kbd "C-c s x") #'my/spawn-shell-same-window)
+(use-package rust-mode
+  :ensure t
+  :defer t)
