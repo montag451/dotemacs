@@ -1,5 +1,6 @@
 /.emacs.desktop
 /.emacs.desktop.lock
+/eln-cache/
 /projectile-bookmarks.eld
 /recentf
 /tramp
@@ -12,5 +13,7 @@
 /url/
 /epkgs/
 /emms/
+/transient/
 /.org-id-locations
 *.pyc
+/custom.el
