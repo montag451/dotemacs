@@ -689,3 +689,8 @@ value."
 (use-package rust-mode
   :ensure t
   :defer t)
+
+(use-package cmake-mode
+  :ensure t
+  :pin melpa
+  :defer t)
