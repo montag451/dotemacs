@@ -444,7 +444,23 @@ value."
   (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
   (add-hook 'ielm-mode-hook #'paredit-mode)
   (add-hook 'lisp-mode-hook #'paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook
+            (lambda ()
+              (let* ((key (kbd "M-r"))
+                     (cmd (key-binding key)))
+                (paredit-mode)
+                (when-let ((orig-cmd cmd)
+                           (paredit-cmd (lookup-key paredit-mode-map key))
+                           (map (make-sparse-keymap)))
+                  (set-keymap-parent map paredit-mode-map)
+                  (define-key map key
+                    (lambda ()
+                      (interactive)
+                      (if (string= (minibuffer-contents) "")
+                          (call-interactively orig-cmd)
+                        (call-interactively paredit-cmd))))
+                  (push `(paredit-mode . ,map)
+                        minor-mode-overriding-map-alist)))))
   :config
   (my/setq paredit-lighter ""))
 
