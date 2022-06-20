@@ -588,7 +588,9 @@ value."
   (add-hook 'go-mode-hook
             (lambda ()
               (my/setq tab-width 4)
-              (whitespace-toggle-options 'tabs)))
+              (setq-local whitespace-style (remq 'tabs whitespace-style))
+              (whitespace-mode 0)
+              (whitespace-mode 1)))
   (add-hook 'before-save-hook #'gofmt-before-save))
 
 (use-package jinja2-mode
