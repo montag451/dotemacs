@@ -121,12 +121,11 @@ value."
 (global-set-key (kbd "C-c s p") #'my/spawn-shell)
 (global-set-key (kbd "C-c s x") #'my/spawn-shell-same-window)
 
-(require 'package)
+(package-initialize)
 (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
 
 ;; always load the latest version of file
 (my/setq load-prefer-newer t)
@@ -413,10 +412,11 @@ value."
   :config
   (with-eval-after-load 'consult
     ;; TODO: improvement
-    (eval `(defun my/grep (dir)
-             ,(documentation 'consult-grep)
-             (interactive "sDirectory: ")
-             (consult-grep dir)))
+    (eval
+     `(defun my/grep (dir)
+        ,(documentation 'consult-grep)
+        (interactive "sDirectory: ")
+        (consult-grep dir)))
     (define-key embark-file-map (kbd "g") #'my/grep)))
 
 (use-package corfu
@@ -570,7 +570,8 @@ value."
   :ensure t
   :after shell
   :init
-  (add-to-list 'shell-dynamic-complete-functions #'bash-completion-dynamic-complete)
+  (add-to-list 'shell-dynamic-complete-functions
+               #'bash-completion-dynamic-complete)
   :config
   (my/setq bash-completion-prog "/usr/bin/env")
   (my/setq bash-completion-remote-prog "/usr/bin/env")
