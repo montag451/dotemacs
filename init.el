@@ -120,6 +120,10 @@ value."
     (with-current-buffer buffer
       (comint-send-eof))))
 
+;; store customized variables into custom.el
+(my/setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file t)
+
 (global-set-key (kbd "C-c s s") #'my/vertico-switch-to-shell-buffer)
 (global-set-key (kbd "C-c s p") #'my/spawn-shell)
 (global-set-key (kbd "C-c s x") #'my/spawn-shell-same-window)
@@ -172,9 +176,6 @@ value."
 
 ;; use UTF-8 with UNIX EOL if possible
 (prefer-coding-system 'utf-8-unix)
-
-;; store customized variables into custom.el. This file is not used.
-(my/setq custom-file (expand-file-name "~/.emacs.d/custom.el"))
 
 ;; make Emacs case sensitive when searching/replacing
 (my/setq case-fold-search nil)
