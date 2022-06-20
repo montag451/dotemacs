@@ -403,7 +403,7 @@ value."
   (with-eval-after-load 'vertico-multiform
     (add-to-list 'vertico-multiform-commands '(consult-imenu buffer))
     (add-to-list 'vertico-multiform-commands '(consult-grep buffer)))
-  (define-key minibuffer-mode-map (kbd "M-r") #'consult-history)
+  (define-key minibuffer-local-map (kbd "M-r") #'consult-history)
   (global-set-key (kbd "C-c h i") #'consult-imenu)
   (global-set-key (kbd "C-c h m") #'consult-man)
   (global-set-key (kbd "C-x b") #'consult-buffer))
