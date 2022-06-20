@@ -398,9 +398,12 @@ value."
   :ensure t
   :config
   (my/setq consult-narrow-key (kbd "<"))
+  (with-eval-after-load 'comint
+    (define-key comint-mode-map (kbd "M-r") #'consult-history))
   (with-eval-after-load 'vertico-multiform
     (add-to-list 'vertico-multiform-commands '(consult-imenu buffer))
     (add-to-list 'vertico-multiform-commands '(consult-grep buffer)))
+  (define-key minibuffer-mode-map (kbd "M-r") #'consult-history)
   (global-set-key (kbd "C-c h i") #'consult-imenu)
   (global-set-key (kbd "C-c h m") #'consult-man)
   (global-set-key (kbd "C-x b") #'consult-buffer))
