@@ -19,6 +19,11 @@ value of the symbol."
                 def))))
     `(progn ,@(nreverse def))))
 
+(defun my/call-key-binding (key)
+  (condition-case nil
+      (call-interactively (key-binding (kbd key)))
+    ('quit nil)))
+
 (defun my/comint-load-history (histfile)
   (lambda ()
     (let* ((proc (get-buffer-process (current-buffer)))
@@ -43,17 +48,6 @@ MODE is a symbol."
         (and (equal major-mode mode)
              (push (buffer-name buf) bufs)))
       (nreverse bufs))))
-
-;; (defun my/helm-switch-to-shell-buffer ()
-;;   (interactive)
-;;   (let ((buffers (my/list-buffers-with-mode 'shell-mode)))
-;;     (if buffers
-;;         (switch-to-buffer
-;;          (helm-comp-read
-;;           "Switch to shell buffer: "
-;;           buffers
-;;           :name "Shell buffers"))
-;;       (message "No shell buffer found!"))))
 
 (defun my/vertico-switch-to-shell-buffer ()
   (interactive)
@@ -291,7 +285,6 @@ value."
 (use-package comint
   :defer t
   :config
-  ;; (define-key comint-mode-map (kbd "M-r") #'helm-comint-input-ring)
   (my/setq comint-scroll-to-bottom-on-input t)
   (add-hook 'comint-exec-hook
             (lambda ()
@@ -441,65 +434,6 @@ value."
   (add-hook 'completion-at-point-functions #'cape-line)
   (add-hook 'completion-at-point-functions #'cape-dabbrev))
 
-;; (use-package helm
-;;   :ensure t
-;;   :bind (:map helm-map
-;;               ("<tab>" . helm-execute-persistent-action)
-;;               ("C-i" . helm-execute-persistent-action)
-;;               ("C-z" . helm-select-action))
-;;   :config
-;;   (my/setq helm-move-to-line-cycle-in-source t)
-;;   (my/setq helm-split-window-inside-p t))
-
-;; (use-package helm-files
-;;   :bind (("C-x C-f" . helm-find-files))
-;;   :config
-;;   (my/setq helm-ff-file-name-history-use-recentf t)
-;;   (my/setq helm-ff-search-library-in-sexp t)
-;;   (my/setq helm-ff-keep-cached-candidates 'local)
-;;   (my/setq helm-substitute-in-filename-stay-on-remote t)
-;;   (add-to-list 'helm-ff-goto-first-real-dired-exceptions 'dired-do-copy)
-;;   (add-to-list 'helm-ff-goto-first-real-dired-exceptions 'dired-do-rename))
-
-;; (use-package helm-buffers
-;;   :bind (("C-x b" . helm-mini))
-;;   :config
-;;   (my/setq helm-buffers-fuzzy-matching t))
-
-;; (use-package helm-for-files
-;;   :defer t
-;;   :config
-;;   (my/setq helm-recentf-fuzzy-match t))
-
-;; (use-package helm-net
-;;   :defer t
-;;   :config
-;;   (my/setq helm-net-prefer-curl t))
-
-;; (use-package helm-occur
-;;   :bind (:map isearch-mode-map
-;;               ("M-i" . helm-occur-from-isearch)))
-
-;; (use-package helm-command
-;;   :bind (("M-x" . helm-M-x))
-;;   :config
-;;   (my/setq helm-M-x-fuzzy-match t))
-
-;; (use-package helm-global-bindings
-;;   :demand
-;;   :bind (:map helm-command-map
-;;               ("g" . helm-do-grep-ag))
-;;   :config
-;;   (my/setq helm-command-prefix-key "C-c h"))
-
-;; (use-package helm-mode
-;;   :config
-;;   (my/setq helm-completion-mode-string nil)
-;;   (my/setq helm-mode-handle-completion-in-region nil)
-;;   (add-to-list 'helm-completing-read-handlers-alist
-;;                '(xref-find-references))
-;;   (helm-mode))
-
 (use-package paredit
   :ensure t
   :defer t
@@ -516,17 +450,10 @@ value."
   :init
   (my/setq projectile-mode-line-prefix "")
   :config
-  ;; (my/setq projectile-completion-system 'helm)
   (my/setq projectile-use-git-grep t)
   (my/setq projectile-dynamic-mode-line nil)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode))
-
-;; (use-package helm-projectile
-;;   :ensure t
-;;   :after helm projectile
-;;   :config
-;;   (helm-projectile-on))
 
 (use-package magit
   :ensure t
@@ -565,10 +492,8 @@ value."
   ("=" balance-windows "balance")
   ("x" delete-window "delete")
   ("X" delete-other-windows "delete other windows")
-  ;; ("b" helm-mini "switch buffer")
-  ;; ("f" helm-find-files "find files")
-  ("b" switch-to-buffer "switch buffer")
-  ("f" find-files "find files")
+  ("b" (my/call-key-binding "C-x b") "switch buffer")
+  ("f" (my/call-key-binding "C-x C-f") "find files")
   ("t" multi-term "term")
   ("n" nil))
 
