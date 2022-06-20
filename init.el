@@ -122,7 +122,6 @@ value."
 
 ;; store customized variables into custom.el
 (my/setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(load custom-file t)
 
 (global-set-key (kbd "C-c s s") #'my/vertico-switch-to-shell-buffer)
 (global-set-key (kbd "C-c s p") #'my/spawn-shell)
@@ -698,3 +697,6 @@ value."
   :ensure t
   :pin melpa
   :defer t)
+
+;; finally load customized variables
+(load custom-file t)
