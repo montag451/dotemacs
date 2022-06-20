@@ -367,6 +367,7 @@ value."
 
 (use-package zenburn-theme
   :ensure t
+  :pin melpa
   :config
   (load-theme 'zenburn t))
 
