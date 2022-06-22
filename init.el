@@ -114,6 +114,18 @@ value."
     (with-current-buffer buffer
       (comint-send-eof))))
 
+(defun my/url-open-stream-fix-tls-over-socks (oldfun name buffer host service &optional gw)
+  (if (and (eq gw 'tls)
+           (eq url-gateway-method 'socks))
+      (let ((conn (funcall oldfun name buffer host service url-gateway-method))
+            (cert (network-stream-certificate host service nil) ))
+        (gnutls-negotiate :process conn
+                          :keylist (and cert (list cert))
+                          :hostname (puny-encode-domain host))
+        (nsm-verify-connection conn host service))
+    (funcall oldfun name buffer host service gw)))
+(advice-add 'url-open-stream :around #'my/url-open-stream-fix-tls-over-socks)
+
 ;; store customized variables into custom.el
 (my/setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
