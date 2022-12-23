@@ -1,2 +1,0 @@
-;;; Generated package description from powershell.el  -*- no-byte-compile: t -*-
-(define-package "powershell" "20220402.643" "Mode for editing PowerShell scripts" '((emacs "24")) :commit "77b27faf8a292f1dc9f54c872241dc53b6791bf1" :authors '(("Frédéric Perrin <frederic (dot) perrin (arobas) resel (dot) fr>")) :maintainer '("Frédéric Perrin <frederic (dot) perrin (arobas) resel (dot) fr>") :keywords '("powershell" "languages") :url "http://github.com/jschaf/powershell.el")
