@@ -545,7 +545,7 @@ value."
   (my/setq gofmt-command "goimports")
   (add-hook 'go-mode-hook
             (lambda ()
-              (my/setq tab-width 4)
+              (setq tab-width 4)
               (setq-local whitespace-style (remq 'tabs whitespace-style))
               (whitespace-mode 0)
               (whitespace-mode 1)))
