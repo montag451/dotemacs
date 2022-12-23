@@ -361,7 +361,8 @@ value."
   (my/setq
    completion-category-overrides
    '((file (styles basic partial-completion))
-     (eval (styles basic partial-completion)))))
+     (eval (styles basic partial-completion))
+     (buffer (styles orderless)))))
 
 ;;; external packages
 
