@@ -656,5 +656,9 @@ value."
   :pin melpa
   :defer t)
 
+(use-package markdown-mode
+  :ensure t
+  :defer t)
+
 ;; finally load customized variables
 (load custom-file t)
