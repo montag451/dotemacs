@@ -24,6 +24,28 @@ value of the symbol."
       (call-interactively (key-binding (kbd key)))
     ('quit nil)))
 
+(defun my/override-minor-mode-key-binding (mode key &optional cmd)
+  (when-let ((mode-map-name (intern-soft (format "%s-map" mode)))
+             (mode-map (symbol-value mode-map-name))
+             (symbol-value mode))
+    (let* ((key (kbd key))
+           (shadowed-cmd (cl-letf (((alist-get mode minor-mode-overriding-map-alist) nil))
+                           (key-binding key)))
+           (mode-cmd (lookup-key mode-map key))
+           (new-cmd (or (and cmd (lambda ()
+                                   (interactive)
+                                   (funcall cmd shadowed-cmd mode-cmd)))
+                        shadowed-cmd
+                        mode-cmd))
+           (map (alist-get mode minor-mode-overriding-map-alist)))
+
+      (when (and new-cmd (not (eq new-cmd mode-cmd)))
+        (unless map
+          (setq map (make-sparse-keymap))
+          (set-keymap-parent map mode-map)
+          (push `(,mode . ,map) minor-mode-overriding-map-alist))
+        (define-key map key new-cmd)))))
+
 (defun my/comint-load-history (histfile)
   (lambda ()
     (let* ((proc (get-buffer-process (current-buffer)))
