@@ -481,21 +481,23 @@ value."
   (add-hook 'lisp-mode-hook #'paredit-mode)
   (add-hook 'eval-expression-minibuffer-setup-hook
             (lambda ()
-              (let* ((key (kbd "M-r"))
-                     (cmd (key-binding key)))
-                (paredit-mode)
-                (when-let ((orig-cmd cmd)
-                           (paredit-cmd (lookup-key paredit-mode-map key))
-                           (map (make-sparse-keymap)))
-                  (set-keymap-parent map paredit-mode-map)
-                  (define-key map key
-                    (lambda ()
-                      (interactive)
-                      (if (string= (minibuffer-contents) "")
-                          (call-interactively orig-cmd)
-                        (call-interactively paredit-cmd))))
-                  (push `(paredit-mode . ,map)
-                        minor-mode-overriding-map-alist)))))
+              (paredit-mode)
+              (my/override-minor-mode-key-binding
+               'paredit-mode "M-r"
+               (lambda (shadowed-cmd mode-cmd)
+                 (let ((point (point)))
+                   (if (or (= point (minibuffer-prompt-end))
+                           (= point (point-max)))
+                       (let ((content (minibuffer-contents)))
+                         (condition-case nil
+                             (progn
+                               (delete-minibuffer-contents)
+                               (call-interactively shadowed-cmd))
+                           (t
+                            (insert content)
+                            (goto-char point))))
+                     (call-interactively mode-cmd)))))
+              (my/override-minor-mode-key-binding 'paredit-mode "RET")))
   :config
   (my/setq paredit-lighter ""))
 
