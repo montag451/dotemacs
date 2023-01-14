@@ -682,5 +682,10 @@ value."
   :ensure t
   :defer t)
 
+(use-package yaml-mode
+  :ensure t
+  :pin melpa
+  :defer t)
+
 ;; finally load customized variables
 (load custom-file t)
