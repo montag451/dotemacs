@@ -108,22 +108,13 @@ the same user and the same host already exists. When called
 interactively with a prefix arg, FORCE is set to a non-nil
 value."
   (interactive "DDefault directory: \nP")
-  (require 'shell)
   (let* ((default-directory dir)
-         (remote (file-remote-p dir))
          (host (or (file-remote-p dir 'host) (system-name)))
          (buffer (format "*shell %s@%s*" (my/get-user) host))
-         (histfile-env-name "HISTFILE")
-         (prev-histfile (getenv histfile-env-name)))
-    (unwind-protect
-        (let ((histfile (expand-file-name (concat remote "~/.bash_history")))
-              (tramp-histfile-override nil))
-          (when remote
-            (setenv histfile-env-name histfile))
-          (shell (if force
-                     (generate-new-buffer-name buffer)
-                   buffer)))
-      (setenv histfile-env-name prev-histfile))))
+         (remote (file-remote-p dir))
+         (histfile (expand-file-name (concat remote "~/.bash_history"))))
+    (with-environment-variables (("HISTFILE" histfile))
+      (shell (if force (generate-new-buffer-name buffer) buffer)))))
 
 (defun my/spawn-shell-same-window (dir &optional force)
   (interactive "DDefault directory: \nP")
