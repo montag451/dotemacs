@@ -687,5 +687,9 @@ value."
   :pin melpa
   :defer t)
 
+(use-package nix-mode
+  :ensure t
+  :defer t)
+
 ;; finally load customized variables
 (load custom-file t)
