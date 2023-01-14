@@ -431,6 +431,8 @@ value."
   (my/setq consult-narrow-key (kbd "<"))
   (with-eval-after-load 'comint
     (define-key comint-mode-map (kbd "M-r") #'consult-history))
+  (with-eval-after-load 'em-hist
+    (define-key eshell-hist-mode-map (kbd "M-r") #'consult-history))
   (with-eval-after-load 'vertico-multiform
     (add-to-list 'vertico-multiform-commands '(consult-imenu buffer))
     (add-to-list 'vertico-multiform-commands '(consult-grep buffer)))
