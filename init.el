@@ -691,5 +691,9 @@ value."
   :ensure t
   :defer t)
 
+(use-package lxc-tramp
+  :ensure t
+  :defer t)
+
 ;; finally load customized variables
 (load custom-file t)
