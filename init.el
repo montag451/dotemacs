@@ -622,6 +622,7 @@ value."
 
 (use-package bash-completion
   :ensure t
+  :pin melpa
   :after shell
   :init
   (add-to-list 'shell-dynamic-complete-functions
