@@ -377,6 +377,11 @@ value."
      (eval (styles basic partial-completion))
      (buffer (styles orderless)))))
 
+(use-package eshell
+  :defer t
+  :config
+  (add-to-list 'eshell-modules-list 'eshell-elecslash))
+
 ;;; external packages
 
 (use-package diminish
