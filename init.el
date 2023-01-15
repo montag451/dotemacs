@@ -145,6 +145,31 @@ value."
     (funcall oldfun name buffer host service gw)))
 (advice-add 'url-open-stream :around #'my/url-open-stream-fix-tls-over-socks)
 
+(defun my/paredit-interactive-mode ()
+  (paredit-mode)
+  (my/override-minor-mode-key-binding
+   'paredit-mode "M-r"
+   (lambda (shadowed-cmd mode-cmd)
+     (let ((point (point))
+           (comint-mode (derived-mode-p 'comint-mode)))
+       (if (or (= point (or (and comint-mode (save-excursion (comint-bol)))
+                            (minibuffer-prompt-end)))
+               (= point (point-max)))
+           (let ((content (or (and comint-mode
+                                   (buffer-substring (comint-bol) (point-max)))
+                              (minibuffer-contents))))
+             (condition-case nil
+                 (progn
+                   (if comint-mode
+                       (delete-region (comint-bol) (point-max))
+                     (delete-minibuffer-contents))
+                   (call-interactively shadowed-cmd))
+               (t
+                (insert content)
+                (goto-char point))))
+         (call-interactively mode-cmd)))))
+  (my/override-minor-mode-key-binding 'paredit-mode "RET"))
+
 ;; store customized variables into custom.el
 (my/setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
@@ -480,28 +505,13 @@ value."
   :ensure t
   :defer t
   :init
-  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
-  (add-hook 'ielm-mode-hook #'paredit-mode)
-  (add-hook 'lisp-mode-hook #'paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook
+  (add-hook 'emacs-lisp-mode-hook
             (lambda ()
               (paredit-mode)
-              (my/override-minor-mode-key-binding
-               'paredit-mode "M-r"
-               (lambda (shadowed-cmd mode-cmd)
-                 (let ((point (point)))
-                   (if (or (= point (minibuffer-prompt-end))
-                           (= point (point-max)))
-                       (let ((content (minibuffer-contents)))
-                         (condition-case nil
-                             (progn
-                               (delete-minibuffer-contents)
-                               (call-interactively shadowed-cmd))
-                           (t
-                            (insert content)
-                            (goto-char point))))
-                     (call-interactively mode-cmd)))))
-              (my/override-minor-mode-key-binding 'paredit-mode "RET")))
+              (my/override-minor-mode-key-binding 'paredit-mode "M-?")))
+  (add-hook 'ielm-mode-hook #'my/paredit-interactive-mode)
+  (add-hook 'lisp-mode-hook #'paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'my/paredit-interactive-mode)
   :config
   (my/setq paredit-lighter ""))
 
