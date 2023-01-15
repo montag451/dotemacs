@@ -413,6 +413,11 @@ value."
   :config
   (add-to-list 'eshell-modules-list 'eshell-elecslash))
 
+(use-package comp
+  :defer t
+  :config
+  (my/setq native-comp-async-report-warnings-errors 'silent))
+
 ;;; external packages
 
 (use-package diminish
