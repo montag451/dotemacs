@@ -11,20 +11,11 @@
 
 ;;; Generated autoloads from bash-completion.el
 
-(autoload 'bash-completion-setup "bash-completion" "\
+(defun bash-completion-setup nil "\
 Register bash completion for the shell buffer and shell command line.
 
 This function adds `bash-completion-dynamic-complete' to the completion
-function list of shell mode, `shell-dynamic-complete-functions'.
-
-This function is convenient, but it might not be the best way of enabling
-bash completion in your .emacs file because it forces you to load the module
-before it is needed. For an autoload version, add:
-
-  (autoload \\='bash-completion-dynamic-complete \"bash-completion\"
-    \"BASH completion hook\")
-  (add-hook \\='shell-dynamic-complete-functions
-            \\='bash-completion-dynamic-complete)")
+function list of shell mode, `shell-dynamic-complete-functions'." (add-hook 'shell-dynamic-complete-functions #'bash-completion-dynamic-complete))
 (autoload 'bash-completion-dynamic-complete "bash-completion" "\
 Return the completion table for bash command at point.
 
@@ -39,16 +30,16 @@ When doing completion outside of a comint buffer, call
 Return completion information for bash command at an arbitrary position.
 
 The bash command to be completed begins at COMP-START in the
-current buffer. This must specify where the current command
+current buffer.  This must specify where the current command
 starts, usually right after the prompt.
 
 COMP-POS is the point where completion should happen, usually
-just (point). Note that a bash command can span across multiple
+just (point).  Note that a bash command can span across multiple
 line, so COMP-START is not necessarily on the same line as
 COMP-POS.
 
 This function does not assume that the current buffer is a shell
-or even comint buffer. It can safely be called from any buffer
+or even comint buffer.  It can safely be called from any buffer
 where a bash command appears, including `completion-at-point'.
 
 If DYNAMIC-TABLE is passed a non-nil value, the resulting
@@ -56,7 +47,7 @@ collection will be a function that fetches the result lazily,
 when it's called.
 
 When calling from `completion-at-point', make sure to pass a
-non-nil value to DYNAMIC-TABLE. This isn't just an optimization:
+non-nil value to DYNAMIC-TABLE.  This isn't just an optimization:
 returning a function instead of a list tells Emacs it should
 avoids post-filtering the results and possibly discarding useful
 completion from bash.
@@ -84,11 +75,11 @@ is t." t)
 (autoload 'bash-completion-reset "bash-completion" "\
 Force the next completion command to start with a fresh BASH process.
 
-This function kills any existing BASH completion process. This
+This function kills any existing BASH completion process.  This
 way, the next time BASH completion is requested, a new process
-will be created with the latest configuration. The BASH
+will be created with the latest configuration.  The BASH
 completion process that will be killed depends on the
-default-directory of the buffer where the command is executed.
+`default-directory' of the buffer where the command is executed.
 
 Call this method if you have updated your .bashrc or any bash init scripts
 and would like bash completion in Emacs to take these changes into account." t)
