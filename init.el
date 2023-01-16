@@ -183,6 +183,15 @@ value."
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
 
+;; recompile packages if necessary
+(dolist (pkg package-alist)
+  (let* ((desc (cadr pkg))
+         (elc (directory-files-recursively
+               (package-desc-dir desc) (rx ".elc" eos))))
+    (unless elc
+      (package-recompile desc)
+      (package--reload-previously-loaded desc))))
+
 ;; always load the latest version of file
 (my/setq load-prefer-newer t)
 
