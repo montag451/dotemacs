@@ -17,3 +17,7 @@
 /.org-id-locations
 *.pyc
 /custom.el
+*.elc
+/elpa/archives/
+/elpa/gnupg/
+/projects
