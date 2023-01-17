@@ -693,7 +693,8 @@ value."
 
 (use-package powershell
   :ensure t
-  :pin melpa)
+  :pin melpa
+  :defer t)
 
 (use-package rust-mode
   :ensure t
