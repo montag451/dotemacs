@@ -491,6 +491,10 @@ value."
   :bind (("C-." . embark-act)
          ("M-." . embark-dwim)))
 
+(use-package embark-consult
+  :ensure t
+  :after embark)
+
 (use-package corfu
   :ensure t
   :pin gnu
