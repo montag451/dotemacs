@@ -489,16 +489,7 @@ value."
 (use-package embark
   :ensure t
   :bind (("C-." . embark-act)
-         ("M-." . embark-dwim))
-  :config
-  (with-eval-after-load 'consult
-    ;; TODO: improvement
-    (eval
-     `(defun my/grep (dir)
-        ,(documentation 'consult-grep)
-        (interactive "sDirectory: ")
-        (consult-grep dir)))
-    (define-key embark-file-map (kbd "g") #'my/grep)))
+         ("M-." . embark-dwim)))
 
 (use-package corfu
   :ensure t
