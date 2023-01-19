@@ -118,7 +118,9 @@ value."
                    "unknown"))
          (buffer (format "*shell %s@%s*" user host))
          (remote (file-remote-p dir))
-         (histfile (expand-file-name (concat remote "~/.bash_history"))))
+         (histfile (file-remote-p
+                    (expand-file-name (concat remote "~/.bash_history"))
+                    'localname)))
     (with-environment-variables (("HISTFILE" histfile))
       (shell (if force (generate-new-buffer-name buffer) buffer)))))
 
