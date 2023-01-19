@@ -486,7 +486,8 @@ value."
   (define-key minibuffer-local-map (kbd "M-r") #'consult-history)
   (global-set-key (kbd "C-c h i") #'consult-imenu)
   (global-set-key (kbd "C-c h m") #'consult-man)
-  (global-set-key (kbd "C-x b") #'consult-buffer))
+  (global-set-key (kbd "C-x b") #'consult-buffer)
+  (global-set-key (kbd "C-x C-b") #'consult-buffer))
 
 (use-package embark
   :ensure t
