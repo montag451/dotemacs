@@ -60,7 +60,7 @@ value of the symbol."
            (unless (process-live-p proc)
              (comint-write-input-ring))))))))
 
-(defun my/list-buffers-with-mode (mode)
+(defun my/list-buffers-with-mode (mode &optional transform)
   "List all buffers with `major-mode' MODE.
 MODE is a symbol."
   (save-current-buffer
@@ -68,12 +68,12 @@ MODE is a symbol."
       (dolist (buf (buffer-list))
         (set-buffer buf)
         (and (equal major-mode mode)
-             (push (buffer-name buf) bufs)))
+             (push (if transform (funcall transform buf) buf) bufs)))
       (nreverse bufs))))
 
 (defun my/vertico-switch-to-shell-buffer ()
   (interactive)
-  (let ((buffers (my/list-buffers-with-mode 'shell-mode)))
+  (let ((buffers (my/list-buffers-with-mode 'shell-mode #'buffer-name)))
     (if buffers
         (switch-to-buffer
          (completing-read
@@ -131,7 +131,7 @@ value."
 
 (defun my/kill-shell-buffers ()
   (interactive)
-  (dolist (buffer (my/list-buffers-with-mode 'shell-mode))
+  (dolist (buffer (my/list-buffers-with-mode 'shell-mode #'buffer-name))
     (with-current-buffer buffer
       (comint-send-eof))))
 
