@@ -483,6 +483,19 @@ value."
   (with-eval-after-load 'vertico-multiform
     (add-to-list 'vertico-multiform-commands '(consult-imenu buffer))
     (add-to-list 'vertico-multiform-commands '(consult-grep buffer)))
+  (add-to-list 'consult-buffer-sources
+               (list
+                :name "Dired Buffer"
+                :category 'buffer
+                :narrow ?d
+                :hidden t
+                :action #'dired
+                :items (lambda ()
+                         (my/list-buffers-with-mode
+                          'dired-mode
+                          (lambda (buf)
+                            (with-current-buffer buf
+                              default-directory))))))
   (define-key minibuffer-local-map (kbd "M-r") #'consult-history)
   (global-set-key (kbd "C-c h i") #'consult-imenu)
   (global-set-key (kbd "C-c h m") #'consult-man)
