@@ -4,10 +4,10 @@
 
 ;; Author: montag451
 ;; URL: https://github.com/montag451/lxc-tramp
-;; Package-Version: 1.1.0
-;; Package-Commit: 7446fdeac276b01e5e65bf826928bd262dd404d8
+;; Package-Version: 1.1.1
+;; Package-Commit: 57559701334bb5635b82a252bd00298d06d794fe
 ;; Keywords: lxc, convenience
-;; Version: 1.1.0
+;; Version: 1.1.1
 ;; Package-Requires: ((emacs "24") (cl-lib "0.6"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -119,7 +119,7 @@ similarly to `process-lines'"
                  (tramp-login-program ,lxc-tramp-lxc-attach-executable)
                  (tramp-login-args (("--clear-env")
                                     ("-v" "HOME=/root")
-                                    ("-n" "%h")
+                                    ("-n") ("%h")
                                     ("--" "su" "-" "%u")))
                  (tramp-remote-shell "/bin/sh")
                  (tramp-remote-shell-args ("-i" "-c")))))
