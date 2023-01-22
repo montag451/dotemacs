@@ -236,9 +236,6 @@ value."
 (my/setq case-fold-search nil)
 (my/setq case-replace nil)
 
-;; search for the symbol at point a la VIM
-(global-set-key (kbd "C-*") #'isearch-forward-symbol-at-point)
-
 ;; remove duplicates entry from history
 (my/setq history-delete-duplicates t)
 
@@ -402,7 +399,7 @@ value."
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
 (use-package isearch
-  :defer t
+  :bind ("C-*" . #'isearch-forward-symbol-at-point)
   :config
   (my/setq isearch-lazy-count t))
 
