@@ -81,16 +81,6 @@ MODE is a symbol."
           buffers))
       (message "No shell buffer found!"))))
 
-(defun my/get-bash-path ()
-  (let ((shell-file-name "/bin/sh"))
-    (with-temp-buffer
-      (unless (zerop (shell-command "bash -c \"type -p bash\"" t))
-        (error "Cannot find bash on %s"
-               (or (file-remote-p default-directory 'host)
-                   (system-name))))
-      (goto-char (point-min))
-      (buffer-substring-no-properties (point) (line-end-position)))))
-
 (defun my/get-user ()
   (if (file-remote-p default-directory)
       (with-temp-buffer
