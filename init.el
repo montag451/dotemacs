@@ -168,8 +168,8 @@ value."
               (if (and desktop-save-mode (not (desktop-owner)))
                   (add-hook 'desktop-after-read-hook
                             (lambda ()
-                              (load-theme 'zenburn t)))
-                (load-theme 'zenburn t)))))
+                              (load-theme theme t)))
+                (load-theme theme t)))))
 
 ;; store customized variables into custom.el
 (my/setq custom-file (expand-file-name "custom.el" user-emacs-directory))
