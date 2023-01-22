@@ -408,8 +408,7 @@ value."
   (my/setq
    completion-category-overrides
    '((file (styles basic partial-completion))
-     (eval (styles basic partial-completion))
-     (buffer (styles orderless)))))
+     (eval (styles basic partial-completion)))))
 
 (use-package eshell
   :defer t
@@ -456,7 +455,8 @@ value."
 (use-package orderless
   :ensure t
   :config
-  (my/setq completion-styles '(orderless basic partial-completion)))
+  (my/setq completion-styles '(orderless basic partial-completion))
+  (setf (alist-get 'buffer completion-category-overrides) '((styles orderless))))
 
 (use-package marginalia
   :ensure t
