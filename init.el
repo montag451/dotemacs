@@ -162,6 +162,15 @@ value."
          (call-interactively mode-cmd)))))
   (my/override-minor-mode-key-binding 'paredit-mode "RET"))
 
+(defun my/load-theme (theme)
+  (add-hook 'after-init-hook
+            (lambda ()
+              (if (and desktop-save-mode (not (desktop-owner)))
+                  (add-hook 'desktop-after-read-hook
+                            (lambda ()
+                              (load-theme 'zenburn t)))
+                (load-theme 'zenburn t)))))
+
 ;; store customized variables into custom.el
 (my/setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
@@ -429,7 +438,7 @@ value."
   :ensure t
   :pin melpa
   :config
-  (load-theme 'zenburn t))
+  (my/load-theme 'zenburn))
 
 (use-package avy
   :ensure t
