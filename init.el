@@ -26,8 +26,8 @@ value of the symbol."
 
 (defun my/override-minor-mode-key-binding (mode key &optional cmd)
   (when-let ((mode-map-name (intern-soft (format "%s-map" mode)))
-             (mode-map (symbol-value mode-map-name))
-             (symbol-value mode))
+             (mode-map (ignore-errors (symbol-value mode-map-name)))
+             (ignore-errors (symbol-value mode)))
     (let* ((key (kbd key))
            (shadowed-cmd (cl-letf (((alist-get mode minor-mode-overriding-map-alist) nil))
                            (key-binding key)))
