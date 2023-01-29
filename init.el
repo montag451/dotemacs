@@ -166,9 +166,13 @@ value."
   (add-hook 'after-init-hook
             (lambda ()
               (if (and desktop-save-mode (not (desktop-owner)))
-                  (add-hook 'desktop-after-read-hook
-                            (lambda ()
-                              (load-theme theme t)))
+                  (progn
+                    (add-hook 'desktop-after-read-hook
+                              (lambda ()
+                                (load-theme theme t)))
+                    (add-hook 'desktop-no-desktop-file-hook
+                              (lambda ()
+                                (load-theme theme t))))
                 (load-theme theme t)))))
 
 ;; store customized variables into custom.el
