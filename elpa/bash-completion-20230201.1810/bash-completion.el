@@ -5,8 +5,8 @@
 ;; Author: Stephane Zermatten <szermatt@gmx.net>
 ;; Maintainer: Stephane Zermatten <szermatt@gmail.com>
 ;; Version: 3.1.1
-;; Package-Version: 20230115.1847
-;; Package-Commit: a021468eec8ff8cacb74a9ea595d3587186e29ea
+;; Package-Version: 20230201.1810
+;; Package-Commit: ffb3f88aaf0db92ea4a2b6c60ea11d4a19245852
 ;; Keywords: convenience, unix
 ;; URL: http://github.com/szermatt/emacs-bash-completion
 ;; Package-Requires: ((emacs "25.3"))
@@ -115,6 +115,7 @@
 (require 'comint)
 (require 'cl-lib)
 (require 'shell)
+(require 'rx)
 
 ;;; Customization
 (defgroup bash-completion nil
@@ -272,7 +273,7 @@ Bash processes.")
 (defconst bash-completion-special-chars "[ -$&-*,:-<>?[-^`{-}]"
   "Regexp of characters that must be escaped or quoted.")
 
-(defconst bash-completion--ps1 "'\t$?\v'"
+(defconst bash-completion--ps1 "'==emacs==ret=$?==.'"
   "Value for the special PS1 prompt set for completions, quoted.")
 
 (eval-when-compile
@@ -356,9 +357,6 @@ returned."
 
 (defun bash-completion--setup-bash-common (process)
   "Setup PROCESS to be ready for completion."
-  (bash-completion-send "complete -p" process)
-  (process-put process 'complete-p
-               (bash-completion-build-alist (bash-completion--get-buffer process)))
   (unless (zerop
            (bash-completion-send "[[ ${BASH_VERSINFO[0]} -ge 4 ]]" process))
     (error "bash-completion.el requires at least Bash 4."))
@@ -412,9 +410,7 @@ returned."
                (with-current-buffer (bash-completion--get-buffer process)
                  (save-excursion
                    (goto-char (point-min))
-                   (and (search-forward "completion-ignore-case on" nil 'noerror) t))))
-
-  (process-put process 'setup-done t))
+                   (and (search-forward "completion-ignore-case on" nil 'noerror) t)))))
 
 ;;; Inline functions
 
@@ -875,9 +871,8 @@ The result is a list of candidates, which might be empty."
       ;; Special 'retry-completion' exit status, typically returned by
       ;; functions bound by complete -D. Presumably, the function has
       ;; just setup completion for the current command and is asking
-      ;; us to retry once with the new configuration.
-      (bash-completion-send "complete -p" process cmd-timeout comp)
-      (process-put process 'complete-p (bash-completion-build-alist buffer))
+      ;; us to retry once with the new configuration, retrieved by
+      ;; bash-completion--customize.
       (bash-completion--customize comp process 'nodefault)
       (setq completion-status (bash-completion-send
                                (bash-completion-generate-line comp)
@@ -1176,18 +1171,40 @@ is set to t."
                   (bash-completion-kill process)
                 (error nil)))))))))
 
-(defun bash-completion--current-shell ()
-  "Figure out what the shell associated with the current buffer is."
-  (let ((prog (or
-               (if (derived-mode-p 'shell-mode)
-                   (or explicit-shell-file-name
-                       (getenv "ESHELL")
-                       shell-file-name))
-               (let ((process (get-buffer-process (current-buffer))))
-                 (when process
-                   (car (process-command process)))))))
-    (when prog
-      (file-name-nondirectory prog))))
+(defun bash-completion--process-command (process)
+  "Return the command that was executed to start PROCESS.
+It is similar to `process-command' but if the process is a remote
+process, it returns the remote command."
+  (with-current-buffer (process-buffer process)
+    (or (and (file-remote-p default-directory)
+             (process-get process 'remote-command))
+        (process-command process))))
+
+(defun bash-completion--process-start-program (process)
+  "Return the program that was executed to start PROCESS."
+  (car (bash-completion--process-command process)))
+
+(defun bash-completion--process-running-program (process)
+  "Return the program currently executed by PROCESS."
+  (with-current-buffer (process-buffer process)
+    (let* ((remote (file-remote-p default-directory))
+           (pid (or (and remote (process-get process 'remote-pid))
+                    (process-id process))))
+      (file-truename (concat remote (format "/proc/%d/exe" pid))))))
+
+(defun bash-completion--is-bash-process (process)
+  "Return a non-nil value if PROCESS is a Bash process."
+  (pcase (process-get process 'is-bash)
+    ('true t)
+    ('false nil)
+    (_ (let* ((res (cl-some
+                    (lambda (fun)
+                      (bash-completion-starts-with
+                       (file-name-nondirectory (funcall fun process)) "bash"))
+                    (list #'bash-completion--process-running-program
+                          #'bash-completion--process-start-program))))
+         (process-put process 'is-bash (if res 'true 'false))
+         res))))
 
 (defun bash-completion--get-same-process ()
   "Return the BASH process associated with the current buffer.
@@ -1197,62 +1214,8 @@ associated with a command that looks like a bash shell.
 Completion will fallback to creating a separate process
 completion in these cases."
   (when (derived-mode-p 'comint-mode)
-    (let* ((process (get-buffer-process (current-buffer)))
-           (shell (if process (bash-completion--current-shell))))
-      (when (and shell (bash-completion-starts-with shell "bash"))
-        (unless (process-get process 'setup-done)
-          ;; The following disables the emacs and vi options. This
-          ;; cannot be done by bash-completion-send as these options
-          ;; interfere with bash-completion-send detecting the end
-          ;; of a command. It disables prompt to avoid interference
-          ;; from commands run by prompts.
-          (let* ((history-unclutter-cmd
-                  (concat
-                   "if [[ ${BASH_VERSINFO[0]} -eq 5 && ${BASH_VERSINFO[1]} -ge 1 || ${BASH_VERSINFO[0]} -gt 5 ]]; then"
-                   "  history -d $HISTCMD &>/dev/null || true;"
-                   "else"
-                   "  history -d $((HISTCMD - 1)) &>/dev/null || true;"
-                   "fi")))
-            (comint-send-string
-             process
-             (concat
-              "set +o emacs;"
-              "set +o vi;"
-              "if [[ -z \"$__emacs_complete_ps1\" ]]; then"
-              "  __emacs_complete_ps1=\"$PS1\";"
-              "  __emacs_complete_pc=\"$PROMPT_COMMAND\";"
-              "fi;"
-              "PS1='' PROMPT_COMMAND='';"
-              history-unclutter-cmd "\n"))
-
-            ;; The following is a bootstrap command for
-            ;; bash-completion-send itself.
-            (bash-completion-send
-             (concat
-              "function __emacs_complete_pre_command {"
-              "  if [[ -z \"$__emacs_complete_ps1\" ]]; then"
-              "    __emacs_complete_ps1=\"$PS1\";"
-              "    __emacs_complete_pc=\"$PROMPT_COMMAND\";"
-              "  fi;"
-              "  PROMPT_COMMAND=__emacs_complete_prompt;"
-              "  " history-unclutter-cmd ";"
-              "} &&"
-              "function __emacs_complete_prompt {"
-              "  PS1=" bash-completion--ps1 ";"
-              "  PROMPT_COMMAND=__emacs_complete_recover_prompt;"
-              "} &&"
-              "function __emacs_complete_recover_prompt {"
-              "  local r=$?;"
-              "  PS1=\"${__emacs_complete_ps1}\";"
-              "  PROMPT_COMMAND=\"${__emacs_complete_pc}\";"
-              "  unset __emacs_complete_ps1 __emacs_complete_pc;"
-              "  if [[ -n \"$PROMPT_COMMAND\" ]]; then"
-              "    (exit $r); eval \"$PROMPT_COMMAND\";"
-              "  fi;"
-              "} &&"
-              "__emacs_complete_pre_command")
-             process))
-          (bash-completion--setup-bash-common process))
+    (let* ((process (get-buffer-process (current-buffer))))
+      (when (bash-completion--is-bash-process process)
         process))))
 
 (defun bash-completion--get-process ()
@@ -1316,14 +1279,16 @@ The returned alist is a slightly parsed version of the output of
 
 (defun bash-completion--customize (comp process &optional nodefault)
   (unless (eq 'command (bash-completion--type comp))
-    (let ((compgen-args-alist
-           (process-get process 'complete-p))
-          (command-name (bash-completion--command comp)))
-      ;; TODO: first lookup the full command path, then only the
-      ;; command name.
-      (setf (bash-completion--compgen-args comp)
-            (or (cdr (assoc command-name compgen-args-alist))
-                (and (not nodefault) (cdr (assoc nil compgen-args-alist))))))))
+    (let* ((complete-p (concat "complete -p "
+                               (bash-completion-quote (bash-completion--command comp))
+                               " 2>/dev/null || complete -p -D"))
+           (status (bash-completion-send
+                    (concat complete-p "&& type -t __emacs_complete_wrapper >/dev/null 2>&1"))))
+    (setf (bash-completion--compgen-args comp)
+          (cdr (car (bash-completion-build-alist
+                     (bash-completion--get-buffer process)))))
+    (when (= 1 status)
+      (bash-completion--setup-bash-common process)))))
 
 (defun bash-completion-generate-line (comp)
   "Generate a bash command to call \"compgen\" for COMP.
@@ -1388,19 +1353,15 @@ completion candidates."
 
 ;;;###autoload
 (defun bash-completion-refresh ()
-  "Force a refresh the completion table.
+  "Does nothing.
 
-This can be called after changing the completion table on BASH,
-or after starting a new BASH job.
+This command is obsolete and doesn't do anything useful anymore.
+It used to refresh the copy of the completion table kept in
+memory, but bash-completion.el now uses the completion table of
+the Bash process directly."
+  (interactive))
 
-This is only useful when `bash-completion-use-separate-processes'
-is t."
-  (interactive)
-  (let* ((process (get-buffer-process (current-buffer))))
-    (unless process
-      (error "No process is available in this buffer"))
-    (process-put process 'setup-done nil)
-    (bash-completion--get-process)))
+(make-obsolete 'bash-completion-refresh "no longer useful." "3.1.2")
 
 ;;;###autoload
 (defun bash-completion-reset ()
@@ -1503,8 +1464,33 @@ Return the status code of the command, as a number."
          (send-string (if bash-completion-use-separate-processes
                           #'process-send-string
                         #'comint-send-string))
-         (pre-command (unless bash-completion-use-separate-processes
-                        "__emacs_complete_pre_command; "))
+         (pre-command
+          (unless bash-completion-use-separate-processes
+            (concat
+             "set +o emacs; set +o vi;"
+             "if [[ -z \"${__emacs_complete_ps1}\" ]]; then "
+             " __emacs_complete_ps1=\"$PS1\";"
+             " __emacs_complete_pc=\"$PROMPT_COMMAND\";"
+             "fi;"
+             "PROMPT_COMMAND=" ;; set a temporary prompt
+             (bash-completion-quote
+              (concat "PS1=" bash-completion--ps1 ";"
+                      "PROMPT_COMMAND=" ;; recover prompt
+                      (bash-completion-quote
+                       (concat
+                        "__emacs_complete_r=$?;"
+                        "PS1=\"${__emacs_complete_ps1}\";"
+                        "PROMPT_COMMAND=\"${__emacs_complete_pc}\";"
+                        "unset __emacs_complete_ps1 __emacs_complete_pc;"
+                        "if [[ -n \"$PROMPT_COMMAND\" ]]; then"
+                        "  (exit $__emacs_complete_r); eval \"$PROMPT_COMMAND\";"
+                        "fi;"))))
+             ;; remove this command from history
+             ";if [[ ${BASH_VERSINFO[0]} -eq 5 && ${BASH_VERSINFO[1]} -ge 1 || ${BASH_VERSINFO[0]} -gt 5 ]]; then"
+             "  history -d $HISTCMD &>/dev/null || true;"
+             "else"
+             "  history -d $((HISTCMD - 1)) &>/dev/null || true;"
+             "fi;")))
          (complete-command (concat pre-command commandline "\n")))
     (setq bash-completion--debug-info
           (list (cons 'commandline complete-command)
@@ -1514,7 +1500,7 @@ Return the status code of the command, as a number."
     (with-current-buffer (bash-completion--get-buffer process)
       (erase-buffer)
       (funcall send-string process complete-command)
-      (unless (bash-completion--wait-for-regexp process "\t-?[[:digit:]]+\v" timeout)
+      (unless (bash-completion--wait-for-regexp process "==emacs==ret=-?[[:digit:]]+==." timeout)
         (push (cons 'error "timeout") bash-completion--debug-info)
         (push (cons 'buffer-string (buffer-substring-no-properties (point-min) (point-max)))
               bash-completion--debug-info)
@@ -1527,8 +1513,8 @@ Return the status code of the command, as a number."
             (delete-region (match-beginning 0) (line-beginning-position 2)))))
       (let ((status (string-to-number
                      (buffer-substring-no-properties
-                      (1+ (point))
-                      (1- (line-end-position)))))
+                      (+ (point) 13)
+                      (- (line-end-position) 1))))
             (wrapped-status (bash-completion--parse-side-channel-data "wrapped-status")))
         (push (cons 'status status) bash-completion--debug-info)
         (push (cons 'wrapped-status wrapped-status) bash-completion--debug-info)
@@ -1578,8 +1564,7 @@ Return the status code of the command, as a number."
     (bash-completion--debug-print-info 'use-separate-processes)
     (bash-completion--debug-print 'emacs-version emacs-version)
     (bash-completion--debug-print-procinfo 'completion-ignore-case)
-    (bash-completion--debug-print-info 'context)
-    (bash-completion--debug-print-procinfo 'complete-p)))
+    (bash-completion--debug-print-info 'context)))
 
 (defun bash-completion--debug-print-info (symbol &optional eof)
   "Print variable SYMBOL from `bash-completion-debug-info'.
