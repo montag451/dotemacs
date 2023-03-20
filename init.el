@@ -731,5 +731,9 @@ value."
   :ensure t
   :defer t)
 
+(use-package erlang
+  :ensure t
+  :defer t)
+
 ;; finally load customized variables
 (load custom-file t)
