@@ -695,6 +695,7 @@ value."
 
 (use-package with-editor
   :ensure t
+  :pin melpa
   :config
   (add-hook 'shell-mode-hook  'with-editor-export-editor)
   (add-hook 'term-exec-hook   'with-editor-export-editor)
