@@ -1,0 +1,36 @@
+#+title: cape.el - Changelog
+#+author: Daniel Mendler
+#+language: en
+
+* Version 0.16 (2023-07-02)
+
+- =cape-dabbrev=: Respect =dabbrev-abbrev-char-regexp= and
+  =dabbrev-abbrev-skip-leading-regexp=.
+- =cape-file=: Quote file names in comint/eshell buffers.
+
+* Version 0.15 (2023-04-17)
+
+- Bugfixes
+
+* Version 0.14 (2023-04-13)
+
+- =cape-wrap-buster=, =cape-capf-buster= and =cape-company-to-capf=: The argument
+  VALID must be a function taking two arguments, the old and new input. It
+  should return nil if the input must be considered invalid such that the
+  candidates must be recomputed.
+- =cape-ispell=: Deprecate in favor of improved =cape-dict=. Note that =cape-ispell=
+  and =ispell-lookup-words= did not really consult =ispell= or =aspell=, but only grep
+  through the word list specified by =ispell-alternate-dictionary=.
+- =cape-dict-file=: Support multiple dictionary files or a function returning one
+  or more files.
+- =cape-dict=, =cape-dabbrev=: Replace case depending on initial input.
+- =cape-dict-case-replace=: New variable to configure case replacement, similar to
+  =dabbrev-case-replace=.
+- =cape-dict-case-fold=: New variable to configure if case is ignored
+  during search and completion.
+- =cape-elisp-block=: Complete Elisp in Org or Markdown code block. This Capf is
+  particularly useful for literate Emacs configurations.
+
+* Version 0.13 (2023-02-15)
+
+- Start of changelog.
