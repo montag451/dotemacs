@@ -490,6 +490,8 @@ value."
                             (with-current-buffer buf
                               default-directory))))))
   (define-key minibuffer-local-map (kbd "M-r") #'consult-history)
+  (consult-customize
+   consult-history :initial nil)
   (global-set-key (kbd "C-c h i") #'consult-imenu)
   (global-set-key (kbd "C-c h m") #'consult-man)
   (global-set-key (kbd "C-x b") #'consult-buffer)
